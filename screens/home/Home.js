@@ -3,7 +3,7 @@ import { View, SafeAreaView, FlatList, Text, StyleSheet, Image, Pressable, Alert
 import Svg, { Path } from 'react-native-svg';
 import { NFTCard, HomeHeader, FocusedStatusBar } from "../../components";
 import { COLORS, FONTS } from "../../constants";
-import { AgeCountry, Welcome, SocialConnect } from "./steps"
+import { AgeCountry, Welcome, SocialConnect, NameEmailPassword, UploadNewStory, UploadFiles, PreviewStory, StorySettings } from "./steps"
 
 var width = Dimensions.get('window').width - 40;
 
@@ -14,7 +14,7 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-       { step !== 1 ?   <Pressable onPress={() => setStep(step - 1)}><HomeHeader setStep={setStep} step={step} /></Pressable> : null }
+       { step > 2 ? <HomeHeader setStep={setStep} step={step} /> : null }
          { step === 1 ? 
         <Welcome />
         : step === 2 ? 
@@ -22,9 +22,15 @@ const Home = () => {
         : step === 3 ? 
         <AgeCountry />
         : step === 4 ? 
-        <Text>Trecias</Text>
-        :
-        <Text>Ketvirtas</Text> 
+        <NameEmailPassword />
+        : step === 5 ? 
+        <UploadNewStory />
+        : step === 6 ? 
+        <UploadFiles />
+        : step === 7 ? 
+        <StorySettings />
+        : 
+        <PreviewStory />
         }
         { step !== 2 ? <Pressable style={styles.button} onPress={() => setStep(step + 1)}>
             <Text style={styles.buttonText}>{step == 1 ? "Join now" : "Continue"}</Text>
