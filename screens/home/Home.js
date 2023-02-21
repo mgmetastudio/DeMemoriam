@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, SafeAreaView, FlatList, Text, StyleSheet, Image, Pressable, Alert, Dimensions } from "react-native";
 import Svg, { Path } from 'react-native-svg';
-import { NFTCard, HomeHeader, FocusedStatusBar } from "../../components";
+import { NFTCard, HomeHeader, FocusedStatusBar, ContinueButton } from "../../components";
 import { COLORS, FONTS } from "../../constants";
 import { AgeCountry, Welcome, SocialConnect, NameEmailPassword, UploadNewStory, UploadFiles, PreviewStory, StorySettings } from "./steps"
 
@@ -14,7 +14,7 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-       { step > 2 ? <HomeHeader setStep={setStep} step={step} /> : null }
+       { step > 2 ? <Pressable style={styles.icon} onPress={() => setStep(step - 1)}><HomeHeader setStep={setStep} step={step} /></Pressable> : null }
          { step === 1 ? 
         <Welcome />
         : step === 2 ? 
@@ -32,9 +32,7 @@ const Home = () => {
         : 
         <PreviewStory />
         }
-        { step !== 2 ? <Pressable style={styles.button} onPress={() => setStep(step + 1)}>
-            <Text style={styles.buttonText}>{step == 1 ? "Join now" : "Continue"}</Text>
-        </Pressable> : null }
+        { step != 2 ? <ContinueButton step={step} setStep={setStep} /> : null}
     </SafeAreaView>
   )
 }

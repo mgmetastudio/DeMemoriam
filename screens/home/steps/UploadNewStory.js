@@ -7,6 +7,8 @@ const UploadNewStory = () => {
 
   const [achievements, setAchievements] = useState('');
 
+  const hobbies = ['writing', 'painting', 'sports', 'cooking', 'dance', 'learning', 'shopping', 'gardening', 'drawing', 'other']
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.logo}>
@@ -16,7 +18,10 @@ const UploadNewStory = () => {
       <View style={styles.logo}>
             <Text style={styles.title2}>What is your hobby</Text>
       </View>
-      <View style={styles.inputContainer}>
+      <View style={styles.list}>
+        {hobbies.map((x, index) => (
+              <Text key={index} style={styles.listItem}>{x}</Text>
+        ))}
       </View>
       <View>
             <Text style={styles.title2}>What is your biggest achievements</Text>
@@ -24,7 +29,7 @@ const UploadNewStory = () => {
               style={styles.input}
               onChangeText={setAchievements}
               value={achievements}
-              placeholder="Country"
+              placeholder="Rise family, build business ..."
             />
       </View>
     </View>
@@ -55,7 +60,7 @@ const styles = StyleSheet.create({
       textAlign: "center",
   },
   title2: {
-    fontSize: 14,
+    fontSize: 18,
     fontFamily: FONTS.regular,
     color: COLORS.gray,
     textAlign: "center",
@@ -78,7 +83,7 @@ const styles = StyleSheet.create({
     padding: 7
   },
   input: {
-    fontSize: 14,
+    fontSize: 18,
     fontFamily: FONTS.regular,
     color: COLORS.gray,
     borderWidth: 1,
@@ -87,8 +92,25 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 2
   },
-  inputContainer: {
-    paddingTop: 25,
-    paddingBottom: 25
+  list: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingBottom: 30,
+  },
+  listItem: {
+    color: COLORS.gray,
+    borderWidth: 1,
+    fontSize: 15,
+    borderColor: COLORS.gray,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    margin: 5,
+    borderRadius: 15,
+    flexGrow: 1,
+    textAlign: "center",
+    textTransform: "capitalize",
   }
 })
