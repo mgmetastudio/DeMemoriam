@@ -4,7 +4,9 @@ import UploadNewStory from "./UploadNewStory"
 import UploadFiles from "./UploadFiles"
 import StorySettings from "./StorySettings"
 import PreviewStory from "./PreviewStory"
+import SocialConnect from "./SocialConnect"
+import Welcome from "./Welcome"
 
 export {
-    AgeCountry
+    AgeCountry, NameEmailPassword, UploadFiles, UploadNewStory, StorySettings, PreviewStory, SocialConnect, Welcome
 }
