@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/Icons/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "rgba(11, 11, 11, 1)"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -18,16 +18,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.andriuskevicius.Dememoriam"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Icons/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "backgroundColor": "rgba(11, 11, 11, 1)"
+      },
+      "package": "com.andriuskevicius.Dememoriam"
     },
     "web": {
       "favicon": "./assets/Icons/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5c98a78c-e4e1-49fb-8788-6aa011d68870"
+      }
     }
   }
 }

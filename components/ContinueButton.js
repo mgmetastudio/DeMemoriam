@@ -1,10 +1,16 @@
 import { View, SafeAreaView, FlatList, Text, StyleSheet, Image, Pressable, Alert, Dimensions } from "react-native";
 import { COLORS, FONTS } from "../constants";
+
 import React from 'react'
 
 var width = Dimensions.get('window').width - 40;
 
 const ContinueButton = (props) => {
+
+   const pressHandler = () => {
+        props.navigation.push('Feed');
+    }
+
   return (
     props.step !== 8 ?
     <View style={styles.buttonWrapper}>
@@ -14,7 +20,7 @@ const ContinueButton = (props) => {
         </Pressable>
     </View> :
     <View style={styles.buttonWrapper2}>
-        <Pressable style={styles.button2} onPress={() => Alert.alert('Mint nft')}>
+        <Pressable style={styles.button2} onPress={pressHandler}>
             <Text style={styles.buttonText}>Mint NFT</Text>
         </Pressable>
         <Pressable style={styles.button3} onPress={() => Alert.alert('Popup saved to gallery')}>
