@@ -4,6 +4,7 @@ import { Image, Dimensions} from 'react-native';
 import { useFonts } from "expo-font";
 import Registration from "./screens/registration/Registration";
 import Home from "./screens/home/Home";
+import Post from "./screens/Post";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,7 @@ const App = () => {
         initialRouteName="Home" >
         <Stack.Screen name="Registration" options={{title: 'Registration'}} component={Registration} />
         <Stack.Screen name="Home" options={{title: 'Home'}} component={Home} />
+        <Stack.Screen name="Post" options={{title: 'Post'}} component={Post} />
       </Stack.Navigator>
     </NavigationContainer>
   );

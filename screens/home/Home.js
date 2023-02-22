@@ -9,7 +9,7 @@ const Home = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       <Header />
       <ScrollView>
-        <Post />
+        <Post navigation={navigation} />
       </ScrollView>
       <BottomBar />
     </SafeAreaView>

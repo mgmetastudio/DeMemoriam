@@ -6,7 +6,7 @@ import { COLORS, FONTS } from "../constants";
 
 var width = Dimensions.get('window').width;
 
-const Post = () => {
+const Post = ({navigation}) => {
     const Posts = [
         {
           id: "NFT-01",
@@ -73,19 +73,23 @@ const Post = () => {
     <View style={styles.list}>
         {Posts.map((x, index) => (
             <View key={index} style={styles.postContainer}>
-              <View style={styles.postTop}>
-                <View style={styles.postTopLeft}>
-                  <Text style={styles.owner}>{x.owner}</Text>
-                  <Text style={styles.info}>{x.date} · {x.status}</Text>
+                <View style={styles.postTop}>
+                  <View style={styles.postTopLeft}>
+                    
+                    <View style={styles.details}>
+                      <Text style={styles.owner}>{x.owner}</Text>
+                      <Text style={styles.info}>{x.date} · {x.status}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.postTopRight}>
+                    <Pressable style={styles.icon} onPress={() => Alert.alert('This will show more details')}>
+                      {more}
+                    </Pressable>
+                  </View>
                 </View>
-                <View style={styles.postTopRight}>
-                  <Pressable style={styles.icon} onPress={() => Alert.alert('This will show more details')}>
-                    {more}
-                  </Pressable>
-                </View>
-              </View>
-              <Image style={styles.image} source={x.image} />
-            
+                <Pressable onPress={() => navigation.navigate("Post", x)}>
+                  <Image style={styles.image} source={x.image} />
+                </Pressable>
             </View>
         ))}
     </View>
