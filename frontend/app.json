@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Dememoriam",
+    "slug": "Dememoriam",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Icons/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/Icons/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/Icons/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.andriuskevicius.Dememoriam"
+    },
+    "web": {
+      "favicon": "./assets/Icons/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5c98a78c-e4e1-49fb-8788-6aa011d68870"
+      }
+    }
+  }
+}
