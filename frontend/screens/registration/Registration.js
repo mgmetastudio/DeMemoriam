@@ -16,7 +16,7 @@ const Registration = ({navigation}) => {
          { step === 1 ? 
         <Welcome />
         : step === 2 ? 
-        <SocialConnect setStep={setStep} />
+        <SocialConnect setStep={setStep} navigation={navigation} />
         : step === 3 ? 
         <AgeCountry />
         : step === 4 ? 

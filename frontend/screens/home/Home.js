@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, SafeAreaView, Dimensions, ScrollView } from "react-native"
 import { BottomBar, Header, Post } from "../../components"
 import { COLORS, FONTS } from "../../constants";
+import Openai from "../../functions/openai"
 
 var height = Dimensions.get('window').height;
 
