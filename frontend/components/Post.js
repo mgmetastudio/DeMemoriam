@@ -10,7 +10,7 @@ const Post = ({navigation}) => {
     const Posts = [
         {
           id: "NFT-01",
-          owner: "Rysard Gvozdovic",
+          owner: "Rysard",
           creator: "Rysard Gvozdovic",
           status: "Public",
           date: "12h",
@@ -38,7 +38,7 @@ const Post = ({navigation}) => {
         },
         {
           id: "NFT-03",
-          owner: "Rysard Gvozdovic",
+          owner: "Rysard",
           creator: "Rysard Gvozdovic",
           status: "Public",
           date: "12h",
@@ -52,7 +52,7 @@ const Post = ({navigation}) => {
         },
         {
           id: "NFT-04",
-          owner: "Rysard Gvozdovic",
+          owner: "Rysard",
           creator: "Rysard Gvozdovic",
           status: "Public",
           date: "12h",
@@ -81,7 +81,9 @@ const Post = ({navigation}) => {
                   <View style={styles.postTopLeft}>
                     
                     <View style={styles.details}>
-                      <Text style={styles.owner}>{x.owner}</Text>
+                      <Pressable onPress={() => navigation.navigate("User", x.owner)}> 
+                        <Text style={styles.owner}>{ x.owner }</Text>
+                      </Pressable>
                       <Text style={styles.info}>{x.date} · {x.status}</Text>
                     </View>
                   </View>

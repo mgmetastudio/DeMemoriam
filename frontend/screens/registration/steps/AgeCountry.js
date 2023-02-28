@@ -3,9 +3,7 @@ import Svg, { Path, G, Defs, Rect, ClipPath } from 'react-native-svg';
 import React, { useState } from 'react'
 import { COLORS, FONTS } from "../../../constants";
 
-export default function AgeCountry() {
-  const [date, setDate] = useState('');
-  const [country, setCountry] = useState('');
+export default function AgeCountry(props) {
   return (
     <View style={styles.wrapper}>
       <View style={styles.logo}>
@@ -20,20 +18,22 @@ export default function AgeCountry() {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          onChangeText={setDate}
+          onChangeText={props.setDate}
           placeholder="MM/dd/year"
-          value={date}
+          value={props.date}
           keyboardType="numeric"
+          placeholderTextColor="rgba(155, 155, 155, 1)"
         />
         <TextInput
           style={styles.input}
-          onChangeText={setCountry}
-          value={country}
+          onChangeText={props.setCountry}
+          value={props.country}
           placeholder="Country"
+          placeholderTextColor="rgba(155, 155, 155, 1)"
         />
       </View>
       <View>
-            <Text style={styles.signIn}>Already have an account? <Text style={styles.signInLink}>Sign in</Text></Text>
+            <Text style={styles.signIn}>Already have an account? <Pressable onPress={() => props.setStep(2)}><Text style={styles.signInLink}>Sign in</Text></Pressable></Text>
       </View>
     </View>
   )

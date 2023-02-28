@@ -4,14 +4,25 @@ import { COLORS, FONTS } from "../constants";
 import Svg, { Path } from 'react-native-svg';
 
 const HomeHeader = (props) => {
+
+  const stepBack = () => {
+    if(props.step < 2) {
+      props.navigation.navigate("Home")
+    } else {
+      props.setStep(props.step - 1);
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Pressable style={styles.icon} onPress={() => Alert.alert('Simple Button pressed')}>
-        <Svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <Path d="M9 1L2 8L9 15" stroke="#54595D" stroke-width="2" stroke-linecap="round"/>
-        </Svg>
+      <Pressable style={styles.icon} onPress={() => stepBack()}>
+        <View style={styles.svgWrapper}>
+          <Svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <Path d="M9 1L2 8L9 15" stroke="#54595D" stroke-width="2" stroke-linecap="round"/>
+          </Svg>
+        </View>
       </Pressable>
-      <Text style={styles.text}>{props.step < 5 ? "Registration" : "Upload new story"}</Text>
+      <Text style={styles.text}>{props.step < 5 ? "Registration" : props.title}</Text>
     </View>
   )
 }
@@ -33,9 +44,15 @@ const styles = StyleSheet.create({
   icon: {
     position: "absolute",
     top: 15,
-    left: 15
+    left: 15,
+    zIndex: 2,
+    width: 50,
+    height: 50,
+  },
+  svgWrapper: {
+    width: 40,
+    height: 40,
   }
- 
 
 });
 

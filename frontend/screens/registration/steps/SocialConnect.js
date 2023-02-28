@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, Image, Dimensions, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions, Pressable, TextInput } from 'react-native'
 import Svg, { Path, G, Defs, Rect, ClipPath } from 'react-native-svg';
-import React from 'react'
+import React, { useState } from 'react'
 import { COLORS, FONTS } from "../../../constants";
+import axios from "axios";
+import { getApiConfig } from '../../../functions/api';
+import * as SecureStore from 'expo-secure-store';
 
 const googleIcon = <Svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <Path d="M20.3684 10.2281C20.3693 9.54663 20.3113 8.8664 20.195 8.19482H10.6992V12.046H16.138C16.0267 12.6611 15.7911 13.2475 15.4455 13.7697C15.0999 14.292 14.6513 14.7393 14.1269 15.0848V17.5846H17.3728C19.2734 15.8444 20.3684 13.271 20.3684 10.2281Z" fill="#4285F4"/>
@@ -29,12 +32,48 @@ const linkedinIcon = <Svg width="20" height="20" viewBox="0 0 20 20" fill="none"
 </ClipPath>
 </Defs>
 </Svg>;
+const emailIcon = <Svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<Path fill-rule="evenodd" clip-rule="evenodd" d="M12.6927 10.4875L18.0529 6.03415V14.9412L12.6927 10.4875ZM8.38641 11.2264L2.83624 15.8382H17.3532L11.803 11.2264L11.2524 11.6841C10.9271 11.9542 10.5175 12.1022 10.0946 12.1022C9.67161 12.1022 9.26207 11.9542 8.93673 11.6841L8.38614 11.2266L8.38641 11.2264ZM7.49711 10.4875L2.13688 14.9409V6.03381L7.49711 10.4872V10.4875ZM10.5264 10.8095L17.3531 5.13691H2.83614L9.66311 10.8095C9.78364 10.9117 9.93659 10.9679 10.0946 10.9679C10.2527 10.9679 10.4056 10.9117 10.5261 10.8095H10.5264ZM17.3777 4H2.81179C2.33138 4.00054 1.87096 4.19165 1.53115 4.53129C1.19151 4.87107 1.00051 5.33152 1 5.81193V15.163C1.00054 15.6434 1.19152 16.104 1.53115 16.4438C1.87093 16.7834 2.33138 16.9745 2.81179 16.9752H17.3777C17.8581 16.9745 18.3186 16.7834 18.6584 16.4438C18.998 16.104 19.189 15.6434 19.1895 15.163V5.81193C19.189 5.33152 18.998 4.8711 18.6584 4.53129C18.3186 4.19165 17.8581 4.00055 17.3777 4Z" fill="#75E9BB"/>
+</Svg>
+
+
+
  
 
 
 
 
 const SocialConnect = (props) => {
+
+  const [email, setEmail] = useState('andriuskevicius.ernestas@gmail.com');
+  const [password, setPassword] = useState('darvienas');
+  const [errorMessages, setErrorMessages] = useState('');
+
+  const Login = async e => {
+    e.preventDefault();
+    const user = {
+      email: email,
+      password: password
+    };
+
+    axios.post("/rest-auth/login/", user, getApiConfig(false))
+      .then((response) => {
+        const data = response.data;
+        save('secure_token', data.access_token);
+        setErrorMessages('');
+      }).catch((error) => {
+        setErrorMessages('Email or password was incorect, try again.');
+        console.log("Login error", error);
+      })
+  };
+  async function save(key, value) {
+    await SecureStore.deleteItemAsync(key)
+    await SecureStore.setItemAsync(key, value);
+    const token = await SecureStore.getItemAsync('secure_token');
+    console.log("Čia jau išsaugotas: ", token);
+    props.navigation.navigate("Home");
+  }
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.logo}>
@@ -44,10 +83,7 @@ const SocialConnect = (props) => {
           <Text style={styles.title}>DeMemoriam</Text>
       </View>
       <View>
-            <Text style={styles.title2}>Lets write history together</Text>
-      </View>
-      <View>
-            <Text style={styles.paragraph}>With a help of AI, create customised NFTs of yourself to let the world remember your whole lifes story</Text>
+            <Text style={styles.title2}>Welcome back</Text>
       </View>
       <View style={styles.buttonsWrapper}>
         <Pressable style={styles.button} onPress={() => props.setStep(3)}>
@@ -59,12 +95,44 @@ const SocialConnect = (props) => {
         <Pressable style={styles.button} onPress={() => props.setStep(3)}>
             <Text style={styles.buttonText}>{ linkedinIcon }Sign up with LinkedIn</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => props.setStep(3)}>
-            <Text style={styles.buttonText}>Sign up with email</Text>
+        <Pressable style={styles.buttonSign} onPress={() => props.setStep(3)}>
+            <Text style={styles.buttonEmailText}>Sign in with email</Text>
         </Pressable>
       </View>
       <View>
-            <Text style={styles.signIn}>Already have an account? <Text style={styles.signInLink}>Sign in</Text></Text>
+      <TextInput
+          style={styles.input}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          placeholder="Email address"
+          placeholderTextColor="rgba(155, 155, 155, 1)"
+          keyboardType="email-address" 
+          caretHidden={false}
+          value={email}
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={setPassword}
+          secureTextEntry={true}
+          placeholder="Password"
+          placeholderTextColor="rgba(155, 155, 155, 1)"
+          value={password} 
+        />
+      </View>
+      <Text style={styles.errorMessage}>{ errorMessages }</Text>
+      <Pressable style={styles.forgot} onPress={() => props.setStep(3)}>
+          <Text style={styles.forgotText}>Forgot password</Text>
+      </Pressable>
+      <Pressable style={styles.buttonSign} onPress={e => Login(e)}>
+            <Text style={styles.buttonSignText}>Sign in</Text>
+        </Pressable>
+      <View>
+            <Text style={styles.signIn}>Don't have account?
+            
+            <Pressable onPress={() => props.setStep(3)}>
+              <Text style={styles.signInLink}>Sign up</Text>
+            </Pressable>
+            </Text>
       </View>
     </View>
   )
@@ -79,6 +147,31 @@ const styles = StyleSheet.create({
   wrapper: {
       marginLeft: 24,
       marginRight: 24,
+  },
+  input: {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.gray,
+    borderWidth: 1,
+    borderColor: "rgba(65, 65, 65, 1)",
+    marginBottom: 7,
+    padding: 10,
+    borderRadius: 2
+  },
+  errorMessage:  {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.error,
+  },
+  forgot: {
+    paddingTop: 5,
+    float: "right",
+    paddingBottom: 20,
+  },
+  forgotText: {
+    color: COLORS.green,
+    fontFamily: FONTS.regular,
+    fontSize: 16
   },
   logo: {
       flexDirection: "row",
@@ -114,10 +207,36 @@ button: {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  padding: 7
+  padding: 10
 },
 buttonText: {
   color: COLORS.white,
+  fontFamily: FONTS.regular,
+  fontSize: 14,
+  textAlign: "center",
+  justifyContent: "center",
+  alignItems: "center",
+},
+buttonSign: {
+  borderWidth: 1,
+  borderColor: COLORS.green,
+  marginBottom: 7,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: 10,
+  marginBottom: 30
+},
+buttonSignText: {
+  color: COLORS.green,
+  fontFamily: FONTS.preety,
+  fontSize: 14,
+  textAlign: "center",
+  justifyContent: "center",
+  alignItems: "center",
+},
+buttonEmailText: {
+  color: COLORS.green,
   fontFamily: FONTS.regular,
   fontSize: 14,
   textAlign: "center",

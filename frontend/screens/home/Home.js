@@ -1,17 +1,18 @@
 import { StyleSheet, Text, View, SafeAreaView, Dimensions, ScrollView } from "react-native"
 import { BottomBar, Header, Post } from "../../components"
 import { COLORS, FONTS } from "../../constants";
+import Openai from "../../functions/openai"
 
 var height = Dimensions.get('window').height;
 
 const Home = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Header />
+      <Header navigation={navigation} />
       <ScrollView>
         <Post navigation={navigation} />
       </ScrollView>
-      <BottomBar />
+      <BottomBar navigation={navigation} portfolio={true} />
     </SafeAreaView>
   )
 }

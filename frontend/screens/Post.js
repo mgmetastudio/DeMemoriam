@@ -37,7 +37,7 @@ const Post = ({navigation, route}) => {
             <Image style={styles.image} source={route.params.image} />
             <View style={styles.imageBottom}>
                 <View style={styles.imageBottomLeft}>
-                    <Pressable onPress={() => navigation.navigate("User")}> 
+                    <Pressable onPress={() => navigation.navigate("User", route.params.owner)}> 
                         <Text style={styles.ownerSecond}>{ route.params.creator }{ mark }</Text>
                     </Pressable>
                     <Text style={styles.status}>{ route.params.date } · { route.params.status }</Text>

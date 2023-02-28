@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, Pressable, Alert, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, Pressable, Dimensions } from 'react-native'
 import React from 'react'
-import Svg, { Path, G, Defs, Rect, ClipPath, Pattern } from 'react-native-svg';
+import Svg, { Path, Rect } from 'react-native-svg';
 import { COLORS, FONTS } from "../constants";
 
 const discovery = <Svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -25,14 +25,20 @@ const portfolio = <Svg width="32" height="32" viewBox="0 0 32 32" fill="none" xm
 
 var width = Dimensions.get('window').width;
 
-const BottomBar = () => {
+const BottomBar = (props) => {
   return (
     <View style={styles.container}>
-      <View style={styles.itemContainer}>{discovery}<Text style={styles.text}>Discovery</Text></View>
-      <View style={styles.itemContainer}>{forYou}<Text style={styles.text}>For you</Text></View>
-      <View style={styles.itemContainer}>{upload}<Text style={styles.text}>Upload</Text></View>
-      <View style={styles.itemContainer}>{trending}<Text style={styles.text}>Trending</Text></View>
-      <View style={styles.itemContainer}>{portfolio}<Text style={styles.text}>Portfolio</Text></View>
+      <Pressable style={styles.button3} onPress={() => props.navigation.navigate("Home")}>
+        <View style={styles.itemContainer}>{discovery}<Text style={styles.text}>Discovery</Text></View>
+      </Pressable>
+      <View style={styles.itemContainer}>{forYou}<Text style={styles.text}>For you</Text><Text style={styles.comingSoon}>Coming soon</Text></View>
+      <Pressable style={styles.button3} onPress={() => props.navigation.navigate("Upload")}>
+        <View style={styles.itemContainer}>{upload}<Text style={styles.text}>Upload</Text></View>
+      </Pressable>
+      <View style={styles.itemContainer}>{trending}<Text style={styles.text}>Trending</Text><Text style={styles.comingSoon}>Coming soon</Text></View>
+      <Pressable style={styles.button3} onPress={() => props.navigation.navigate("User")}>
+        <View style={styles.itemContainer}>{portfolio}<Text style={styles.text}>Portfolio</Text></View>
+      </Pressable>
     </View>
   )
 }
@@ -56,7 +62,7 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontFamily: FONTS.light,
     marginTop: 5,
-    fontSize: 15,
+    fontSize: 13,
   },
   itemContainer: {
     display: "flex",
@@ -64,5 +70,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
 
+  },
+  comingSoon: {
+    position: "absolute",
+    color: COLORS.green,
+    fontFamily: FONTS.medium,
+    fontSize: 8,
+    textTransform: "uppercase",
+    whiteSpace: "nowrap",
+    top: 0,
+    left: 0,
   },
 })

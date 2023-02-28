@@ -11,6 +11,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos, so you can upload it on Dememoriam."
+        }
+      ]
+    ],
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -18,14 +26,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.metastudia.Dememoriamios"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Icons/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.andriuskevicius.Dememoriam"
+      "package": "com.metastudia.Dememoriam"
     },
     "web": {
       "favicon": "./assets/Icons/favicon.png"

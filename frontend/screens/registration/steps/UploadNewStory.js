@@ -29,6 +29,7 @@ const UploadNewStory = () => {
               style={styles.input}
               onChangeText={setAchievements}
               value={achievements}
+              placeholderTextColor="rgba(155, 155, 155, 1)"
               placeholder="Rise family, build business ..."
             />
       </View>

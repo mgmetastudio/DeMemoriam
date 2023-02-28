@@ -4,7 +4,8 @@ export const COLORS = {
     white: "rgba(238, 238, 238, 1)",
     gray: "rgba(155, 155, 155, 1)",
     green: "rgba(117, 233, 187, 1)",
-    black: "rgba(11, 11, 11, 1)"
+    black: "rgba(11, 11, 11, 1)",
+    error: "#ff0033"
   };
   
   export const SIZES = {
