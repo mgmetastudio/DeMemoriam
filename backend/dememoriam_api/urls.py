@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework import routers
 from dememoriam_api import settings
-from dememoriam_api.apps.users.views import ResendEmailVerificationView, UserProfileView
+from dememoriam_api.apps.users.views import ResendEmailVerificationView, UserAvatarView, UserProfilePublicView, UserProfileView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +31,8 @@ urlpatterns = [
     path('account-confirm-email/<key>/', TemplateView.as_view(), name='account_confirm_email'),
 
     path('user/profile/', UserProfileView.as_view()),
+    path('user/profile/<username>/', UserProfilePublicView.as_view()),
+    path('user/profile/avatar/', UserAvatarView.as_view()),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

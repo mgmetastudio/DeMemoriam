@@ -7,12 +7,28 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from dememoriam_api.apps.users.serializers import UserProfileSerializer, UserAvatarSerializer
-
+from dememoriam_api.apps.users.serializers import UserProfilePublicSerializer, UserProfileSerializer, UserAvatarSerializer
+from django.http import Http404
+from rest_framework.permissions import AllowAny
+from dememoriam_api.apps.users.models import User
 
 class UserProfileView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = UserProfileSerializer
+    serializer_class = UserProfileSerializer    
+    
+    def get_object(self):
+        return self.request.user
+    
+
+class UserProfilePublicView(RetrieveUpdateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = UserProfilePublicSerializer
+
+    def get_object(self):
+        user = User.objects.filter(username__iexact=self.kwargs['username']).first()
+        if not user:
+            raise Http404
+        return user
 
 
 class UserAvatarView(UpdateAPIView):

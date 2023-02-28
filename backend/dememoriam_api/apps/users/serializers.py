@@ -25,6 +25,13 @@ class UserProfileSerializer(CountryFieldMixin, serializers.ModelSerializer):
         return username
 
 
+class UserProfilePublicSerializer(CountryFieldMixin, serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ('username', 'email', 'avatar',
+                  'about_me', 'country', "birth_date", 'first_name', "last_name")
+        
+
 class UserAvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
