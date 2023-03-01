@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     buttonWrapper: {
         position: 'absolute',
-        bottom: 45,
+        bottom: 20,
     },
     buttonWrapper2: {
         position: 'absolute',

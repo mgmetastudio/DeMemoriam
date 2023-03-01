@@ -23,6 +23,7 @@ const Upload = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [loadingIcon, setLoadingIcon] = useState(false);
   const [token, setToken] = useState('');
+  const [missing, setMissing] = useState('');
 
   const hobbies = ['writing', 'painting', 'sports', 'cooking', 'dance', 'learning', 'shopping', 'gardening', 'drawing', 'other..'];
   const [selected, setSelected] = useState([]);
@@ -38,7 +39,23 @@ const Upload = ({ navigation }) => {
   }
 
   const setAction = () => {
-    if(step === 3) {
+    if(step === 1) {
+      if(!hobbies || !achievements) {
+        setMissing('Please fill both fields hobbies and achievements')
+      } else {
+        setMissing('')
+        setStep(step + 1)
+      }
+    }
+    else if(step === 2) {
+      if(!image) {
+        setMissing('Please select image to upload first')
+      } else {
+        setMissing('')
+        setStep(step + 1)
+      }
+    }
+    else if(step === 3) {
       generateDID();
       setStep(step + 1)
     } else {
@@ -142,8 +159,6 @@ const Upload = ({ navigation }) => {
     getToken();
   }, []);
 
-  console.log("Wop:", token);
-
   return (
         <SafeAreaView style={styles.container}>
             <HomeHeader title={step === 1 ? "What are your thoughts" : "Upload your looks"} step={step} setStep={setStep} navigation={navigation} />
@@ -156,11 +171,13 @@ const Upload = ({ navigation }) => {
                     setOtherHobbies={setOtherHobbies}
                     hobbies={hobbies}
                     selected={selected}
+                    missing={missing}
                 /> : 
                 step === 2 ?
                 <Photos
                     image={image}
                     setImage={setImage} 
+                    missing={missing}
                 /> :
                 step === 3 ?
                 <Edit 

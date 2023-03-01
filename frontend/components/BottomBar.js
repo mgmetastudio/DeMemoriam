@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Pressable, Dimensions } from 'react-native'
-import React from 'react'
+import React, {useState} from 'react'
 import Svg, { Path, Rect } from 'react-native-svg';
 import { COLORS, FONTS } from "../constants";
 
@@ -26,17 +26,23 @@ const portfolio = <Svg width="32" height="32" viewBox="0 0 32 32" fill="none" xm
 var width = Dimensions.get('window').width;
 
 const BottomBar = (props) => {
+  const [active, setActive] = useState('Home');
+  const navigationActive = (location) => {
+    setActive(location);
+    props.navigation.navigate(location);
+  }
+
   return (
     <View style={styles.container}>
-      <Pressable style={styles.button3} onPress={() => props.navigation.navigate("Home")}>
+      <Pressable style={[styles.button3, active ? styles.active : null]} onPress={() => navigationActive("Home")}>
         <View style={styles.itemContainer}>{discovery}<Text style={styles.text}>Discovery</Text></View>
       </Pressable>
-      <View style={styles.itemContainer}>{forYou}<Text style={styles.text}>For you</Text><Text style={styles.comingSoon}>Coming soon</Text></View>
-      <Pressable style={styles.button3} onPress={() => props.navigation.navigate("Upload")}>
+      <View style={[styles.itemContainer, active ? styles.active : null]}>{forYou}<Text style={styles.text}>For you</Text><Text style={styles.comingSoon}>Coming soon</Text></View>
+      <Pressable style={styles.button3} onPress={() => navigationActive("Upload")}>
         <View style={styles.itemContainer}>{upload}<Text style={styles.text}>Upload</Text></View>
       </Pressable>
-      <View style={styles.itemContainer}>{trending}<Text style={styles.text}>Trending</Text><Text style={styles.comingSoon}>Coming soon</Text></View>
-      <Pressable style={styles.button3} onPress={() => props.navigation.navigate("User")}>
+      <View style={[styles.itemContainer, active ? styles.active : null]}>{trending}<Text style={styles.text}>Trending</Text><Text style={styles.comingSoon}>Coming soon</Text></View>
+      <Pressable style={styles.button3} onPress={() => navigationActive("User")}>
         <View style={styles.itemContainer}>{portfolio}<Text style={styles.text}>Portfolio</Text></View>
       </Pressable>
     </View>

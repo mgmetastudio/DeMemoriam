@@ -10,7 +10,7 @@ const cancel =
 </Svg>
 
 
-const Photos = ({image, setImage}) => {
+const Photos = ({image, setImage, missing}) => {
 
   const pickImage = async () => {
     console.log('image upload function');
@@ -23,6 +23,7 @@ const Photos = ({image, setImage}) => {
     });
 
     if (!result.canceled) {
+      console.log(result.assets[0].uri);
       setImage(result.assets[0].uri);
     }
   };
@@ -44,6 +45,7 @@ const Photos = ({image, setImage}) => {
         <Pressable onPress={() => setImage(null)} style={styles.iconWrapper} >{cancel}</Pressable>
         <Image style={styles.image} source={{ uri: image, width: 65, height: 65, }} />
     </View> : null }
+    <View><Text style={styles.errorMessage}>{missing}</Text></View>
   </View>
   )
 }
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
     paddingTop: 25,
   },
   image: {
-    borderRadius: "50%",
+    borderRadius: 35,
   },
   uploadedImage: {
     position: "relative",
@@ -121,11 +123,16 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     zIndex: 2,
-    borderRadius: "50%",
+    borderRadius: 12,
   },
   text: {
     color: COLORS.gray,
     fontFamily: FONTS.regular,
     fontSize: 14,
-  }
+  },
+  errorMessage:  {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.error,
+  },
 })

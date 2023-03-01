@@ -15,21 +15,18 @@ const Welcome = () => {
         <Text style={{ fontFamily: FONTS.preety, color: "rgba(238, 238, 238, 1)", fontSize: 22 }}>DeMemoriam</Text>
     </View>
     <View>
-        <Text style={styles.title}>Empower your digital self with AI and 
-        blockchain</Text>
-        <Image
+        <Text style={styles.title}>Empower your digital self with AI and <Image
             style={{
             width: 140,
             height: 45,
             borderRadius: 30,
             borderWidth: 1,
             borderColor: COLORS.green,
-            position: "absolute",
-            bottom: 77,
-            right: 90
             }}
             source={require('../../../assets/Images/face-main.png')} 
-        />
+        /> 
+        blockchain</Text>
+        
     </View>
         <View style={styles.list}>
             <Text style={styles.listItem}>AI based live avatars</Text>
@@ -59,7 +56,7 @@ const styles = StyleSheet.create({
         marginTop: 30
     },
     title: {
-        fontSize: 48,
+        fontSize: 40,
         fontFamily: FONTS.preety,
         color: COLORS.white,
         lineHeight: 62,
@@ -91,6 +88,8 @@ const styles = StyleSheet.create({
         borderColor: COLORS.green,
         borderWidth: 1,
         padding: 5,
+        paddingLeft: 10,
+        paddingRight: 10,
         borderRadius: 15,
         margin: 5,
     },

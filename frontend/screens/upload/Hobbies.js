@@ -4,41 +4,46 @@ import { COLORS, FONTS } from "../../constants";
 
 var width = Dimensions.get('window').width - 40;
 
-const Hobbies = ({selected, hobbies, setAchievements, setOtherHobbies, achievements, otherHobbies, handleSelectItem}) => {
+const Hobbies = ({selected, hobbies, setAchievements, setOtherHobbies, achievements, otherHobbies, handleSelectItem, missing}) => {
   return (
     <View style={styles.wrapper}>
-    <View style={styles.logo}>
-        <Text style={styles.title}>Answer few questions to {"\n"}
-        generate your AI profile.</Text>
-    </View>
-    <View style={styles.logo}>
-            <Text style={styles.title2}>What is your hobby</Text>
-    </View>
-    <View style={styles.list}>
-        {hobbies.map((x, key) => (
-            <Pressable key={key} style={selected.filter(selected => selected.includes(x)).length > 0 ? styles.listItemActive : styles.listItem} onPress={() => handleSelectItem(key, x)}>
-                <Text style={selected.filter(selected => selected.includes(x)).length > 0 ? styles.listTextActive : styles.listText}>{x}</Text>
-            </Pressable>
-        ))}
-    </View>
-    <View>
-    { selected.filter(selected => selected.includes('other..')).length > 0 ?
-        <TextInput
-            style={styles.input}
-            onChangeText={setOtherHobbies}
-            value={otherHobbies}
-            placeholder="Other"
-            placeholderTextColor="rgba(155, 155, 155, 1)"
-        /> : null }
-        <TextInput
-            style={styles.input}
-            onChangeText={setAchievements}
-            value={achievements}
-            placeholder="Greatest achievement"
-            placeholderTextColor="rgba(155, 155, 155, 1)"
-        />
-    </View>
-</View>
+      <View style={styles.logo}>
+          <Text style={styles.title}>Answer few questions to {"\n"}
+          generate your AI profile.</Text>
+      </View>
+      <View style={styles.logo}>
+              <Text style={styles.title2}>What is your hobby</Text>
+      </View>
+      <View style={styles.list}>
+          {hobbies.map((x, key) => (
+              <Pressable key={key} style={selected.filter(selected => selected.includes(x)).length > 0 ? styles.listItemActive : styles.listItem} onPress={() => handleSelectItem(key, x)}>
+                  <Text style={selected.filter(selected => selected.includes(x)).length > 0 ? styles.listTextActive : styles.listText}>{x}</Text>
+              </Pressable>
+          ))}
+      </View>
+      <View>
+      { selected.filter(selected => selected.includes('other..')).length > 0 ?
+          <TextInput
+              style={styles.input}
+              onChangeText={setOtherHobbies}
+              value={otherHobbies}
+              placeholder="Other"
+              placeholderTextColor="rgba(155, 155, 155, 1)"
+          /> : null }
+          <View style={styles.logo}>
+              <Text style={styles.title2}>Write your biggest achievement in your life</Text>
+          </View>
+          <TextInput
+              style={styles.input}
+              onChangeText={setAchievements}
+              value={achievements}
+              placeholder="Greatest achievement"
+              multiline={true}
+              placeholderTextColor="rgba(155, 155, 155, 1)"
+          />
+      </View>
+      <View><Text style={styles.errorMessage}>{missing}</Text></View>
+  </View>
   )
 }
 
@@ -161,5 +166,10 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.regular,
         textAlign: "center",
         textTransform: "capitalize",
+      },
+      errorMessage:  {
+        fontSize: 14,
+        fontFamily: FONTS.regular,
+        color: COLORS.error,
       },
   })

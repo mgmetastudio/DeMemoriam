@@ -13,7 +13,8 @@ const success = <Svg width="65" height="64" viewBox="0 0 65 64" fill="none" xmln
 const PopupSuccess = ({setModalVisible, modalVisible, navigation}) => {
 
     const closed = () => {
-        setModalVisible(!modalVisible)
+        setModalVisible(!modalVisible);
+        navigation.navigate("Home");
     }
 
 

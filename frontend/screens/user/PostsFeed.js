@@ -4,7 +4,6 @@ import React from 'react'
 var width = Dimensions.get('window').width / 3;
 
 const PostsFeed = ({posts}) => {
-    console.log(posts.image)
   return (
     <View>
         <View style={styles.list}>
