@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('flow_address', models.CharField(blank=True, max_length=64, null=True)),
-                ('avatar', django_resized.forms.ResizedImageField(blank=True, crop=['middle', 'center'], force_format=None, keep_meta=True, null=True, quality=-1, scale=None, size=[500, 500], upload_to='avatars')),
+                ('avatar', django_resized.forms.ResizedImageField(blank=True, crop=['middle', 'center'], force_format=None, keep_meta=True, null=True, quality=-1, size=[500, 500], upload_to='avatars')),
                 ('about_me', models.CharField(blank=True, max_length=164, null=True)),
                 ('country', django_countries.fields.CountryField(blank=True, max_length=2)),
                 ('birth_date', models.DateField(blank=True, null=True)),
