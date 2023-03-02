@@ -12,6 +12,8 @@ class User(AbstractUser):
     about_me = models.TextField(null=True, blank=True)
     country = CountryField(blank=True)
     birth_date = models.DateField(null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=64, null=True, blank=True)
 
     def __str__(self):
         return self.email

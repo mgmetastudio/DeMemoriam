@@ -11,7 +11,7 @@ class UserProfileSerializer(CountryFieldMixin, serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('flow_address', 'username', 'email', 'avatar',
-                  'about_me', 'country', "birth_date", 'first_name', "last_name")
+                  'about_me', 'country', "birth_date", 'first_name', "last_name", "gender")
         extra_kwargs = {'username': {'required': False}}
         read_only_fields = ('email', 'avatar',)
 
@@ -29,7 +29,7 @@ class UserProfilePublicSerializer(CountryFieldMixin, serializers.ModelSerializer
     class Meta:
         model = UserModel
         fields = ('username', 'email', 'avatar',
-                  'about_me', 'country', "birth_date", 'first_name', "last_name")
+                  'about_me', 'country', "birth_date", 'first_name', "last_name", "gender")
         
 
 class UserAvatarSerializer(serializers.ModelSerializer):
