@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'django_countries',
     'dememoriam_api.apps.users',
+    'dememoriam_api.apps.nfts',
 ]
 
 MIDDLEWARE = [
@@ -191,6 +192,11 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Dememoriam Support] '
 CORS_ALLOWED_ORIGINS = [
     'https://app.dememoriam.ai',
 ]
+
+FLOW_MINTER_ADDRESS = ""
+FLOW_MINTER_HASH_ALGO = ""
+FLOW_MINTER_SIGN_ALGO = ""
+FLOW_MINTER_PRIVATE_KEY = ""
 
 try:
     from dememoriam_api.local_settings import *
