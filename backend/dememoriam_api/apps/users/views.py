@@ -5,7 +5,7 @@ from django.views.decorators.cache import cache_page
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from rest_framework.generics import RetrieveUpdateAPIView, UpdateAPIView
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from dememoriam_api.apps.users.serializers import UserProfilePublicSerializer, UserProfileSerializer, UserAvatarSerializer
 from django.http import Http404
@@ -20,24 +20,11 @@ class UserProfileView(RetrieveUpdateAPIView):
         return self.request.user
     
 
-class UserProfilePublicView(RetrieveUpdateAPIView):
-    permission_classes = (AllowAny,)
-    serializer_class = UserProfilePublicSerializer
-
-    def get_object(self):
-        user = User.objects.filter(username__iexact=self.kwargs['username']).first()
-        if not user:
-            raise Http404
-        return user
-
-
-class UserAvatarView(UpdateAPIView):
+class UserProfilePublicView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = UserAvatarSerializer
-    parser_classes = (MultiPartParser, FormParser)
-
-    def get_object(self):
-        return self.request.user
+    serializer_class = UserProfilePublicSerializer
+    queryset = User.objects.all()
+    lookup_field = "username"
 
 
 class ResendEmailVerificationView(OriginalResendEmailVerificationView):

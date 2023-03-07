@@ -20,7 +20,7 @@ class PostNft(models.Model):
     creator = models.CharField(max_length=164, null=True, blank=True)
     collection = models.CharField(max_length=64, null=True, blank=True)
     description = models.CharField(max_length=512,null=True, blank=True)
-    image = ResizedImageField(size=[500, 500], crop=['middle', 'center'], upload_to='images', blank=True, null=True)
+    image = ResizedImageField(size=[1000, 1000], crop=['middle', 'center'], upload_to='images', blank=True, null=True)
     video = models.FileField(upload_to='videos', blank=True, null=True)
 
     internal_id = models.CharField(max_length=32, blank=True, null=True)

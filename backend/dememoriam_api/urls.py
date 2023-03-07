@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework import routers
+from dememoriam_api.apps.nfts.views import PostNftImageView, PostNftPublicView, PostNftVideoView, PostNftViewSet
 from dememoriam_api import settings
-from dememoriam_api.apps.users.views import ResendEmailVerificationView, UserAvatarView, UserProfilePublicView, UserProfileView
+from dememoriam_api.apps.users.views import ResendEmailVerificationView, UserProfilePublicView, UserProfileView
+
+router = routers.SimpleRouter()
+router.register('posts', PostNftViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,7 +36,14 @@ urlpatterns = [
 
     path('user/profile/', UserProfileView.as_view()),
     path('user/profile/<username>/', UserProfilePublicView.as_view()),
-    path('user/profile/avatar/', UserAvatarView.as_view()),
+
+    path('posts/<pk>/image/', PostNftImageView.as_view()),
+    path('posts/<pk>/video/', PostNftVideoView.as_view()),
+
+    path('feed/', PostNftPublicView.as_view()),
+
+    path('', include(router.urls)),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
