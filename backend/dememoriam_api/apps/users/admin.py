@@ -13,8 +13,8 @@ class UserAdmin(UserAdmin):
     list_display = ['email', 'first_name', 'about_me', 'flow_address', ]
 
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'flow_address')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (None, {'fields': ('username', 'password', 'flow_address', 'phone_number')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'about_me')}),
         (_('Permissions'), {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),

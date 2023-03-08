@@ -6,6 +6,7 @@ from django_countries.fields import CountryField
 from django_resized import ResizedImageField
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from rest_framework.fields import RegexValidator
 
 
 class User(AbstractUser):
@@ -28,6 +29,7 @@ class User(AbstractUser):
     birth_date = models.DateField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=64, null=True, blank=True)
+    phone_number = models.CharField(max_length=64, null=True, blank=True, validators=[RegexValidator(regex="^[0-9]*$", message="Enter a phone number. Only numbers allowed")])
 
     def __str__(self):
         return self.email
