@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 from rest_framework import routers
 from dememoriam_api.apps.nfts.views import PostNftImageView, PostNftPublicView, PostNftVideoView, PostNftViewSet
 from dememoriam_api import settings
-from dememoriam_api.apps.users.views import ResendEmailVerificationView, UserProfilePublicView, UserProfileView
+from dememoriam_api.apps.users.views import ResendEmailVerificationView, UserAvatarView, UserProfilePublicView, UserProfileView
 
 router = routers.SimpleRouter()
 router.register('posts', PostNftViewSet)
@@ -34,8 +34,9 @@ urlpatterns = [
     path('password-reset/confirm/<uidb64>/<token>/', TemplateView.as_view(), name='password_reset_confirm'),
     path('account-confirm-email/<key>/', TemplateView.as_view(), name='account_confirm_email'),
 
-    path('user/profile/', UserProfileView.as_view()),
-    path('user/profile/<username>/', UserProfilePublicView.as_view()),
+    path('user/profile/', UserProfileView.as_view()),  
+    path('user/profile/avatar/', UserAvatarView.as_view()),
+    path('user/profile/<username>/', UserProfilePublicView.as_view()),  
 
     path('posts/<pk>/image/', PostNftImageView.as_view()),
     path('posts/<pk>/video/', PostNftVideoView.as_view()),

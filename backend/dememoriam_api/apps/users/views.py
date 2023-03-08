@@ -19,6 +19,15 @@ class UserProfileView(RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
     
+    
+class UserAvatarView(UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserAvatarSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_object(self):
+        return self.request.user
+
 
 class UserProfilePublicView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
