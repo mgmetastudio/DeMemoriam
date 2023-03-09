@@ -14,7 +14,7 @@ class PostNftOwnerSerializer(serializers.ModelSerializer):
 
 
 class PostNftSerializer(serializers.ModelSerializer):
-    owner = PostNftOwnerSerializer()
+    owner = PostNftOwnerSerializer(read_only=True)
 
     class Meta:
         model = PostNft
