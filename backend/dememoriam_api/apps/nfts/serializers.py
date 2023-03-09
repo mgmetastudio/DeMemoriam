@@ -1,10 +1,21 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from dememoriam_api.apps.users.serializers import UserProfilePublicSerializer
 from dememoriam_api.apps.nfts.models import PostNft
 from django.contrib.auth import get_user_model
 
+UserModel = get_user_model()
+
+
+class PostNftOwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ('id', 'username', 'avatar', 'first_name', "last_name",)
+
 
 class PostNftSerializer(serializers.ModelSerializer):
+    owner = PostNftOwnerSerializer()
+
     class Meta:
         model = PostNft
         fields = ('id', 'owner', 'status', 'access', 'creator', 'collection', 'description', "image", 'video', 
