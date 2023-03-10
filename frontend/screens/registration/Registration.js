@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { SafeAreaView, StyleSheet, Pressable, Dimensions, Button } from "react-native";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, StyleSheet, Pressable, Dimensions, Button, Keyboard } from "react-native";
 import { HomeHeader, ContinueButton } from "../../components";
 import { COLORS, FONTS } from "../../constants";
-import { AgeCountry, Welcome, SocialConnect, NameEmailPassword, UploadNewStory, UploadFiles, PreviewStory, StorySettings, Complete } from "./steps"
+import { AgeCountry, Welcome, SocialConnect, NameEmailPassword, Complete, Slide } from "./steps"
 import axios from "axios"
 import { getApiConfig } from '../../functions/api';
 import * as SecureStore from 'expo-secure-store';
@@ -10,20 +10,26 @@ import * as SecureStore from 'expo-secure-store';
 var width = Dimensions.get('window').width - 40;
 
 const Registration = ({navigation}) => {
-
-  const [date, setDate] = useState('');
+  const currentDate = new Date();
+  const [date, setDate] = useState(new Date(currentDate.getFullYear() - 18, currentDate.getMonth(), currentDate.getDate()));
   const [country, setCountry] = useState('');
   const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password1, setPassword1] = useState('');
   const [password2, setPassword2] = useState('');
   const [step, setStep] = useState(1);
   const [errorMessages, setErrorMessages] = useState('');
+  const [showLogin, setShowLogin] = useState('');
+  const [validation, setValidation] = useState(true);
+  const [gender, setGender] = useState(null);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const onRegistration = async e => {
     e.preventDefault();
     const registration = {
-      name: name,
+      username: username,
       email: email,
       password1: password1,
       password2: password2,
@@ -74,52 +80,101 @@ const Registration = ({navigation}) => {
   */
 
   console.log('Collected info:', name, email, date, country, password1, password2);
+  const onContinue = () => {
+    if(step === 1) {
+      setStep(step + 1);
+    } else if(step === 3) {
+      if( gender && country && date ) {
+        setStep(step + 1);
+      } else {
+        setValidation(false);
+      }
+    } else {
+      setStep(step + 1);
+    }
+  }
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      { step === 1 ?
-          <Pressable style={styles.icon} onPress={() => setStep(step - 1)}><HomeHeader setStep={setStep} step={step} /></Pressable> : 
+      
+      {   step === 1 ?
+          null : 
           step === 2 ? 
           null : 
           step === 3 ? 
-          <Pressable style={styles.icon} onPress={() => setStep(step - 1)}><HomeHeader setStep={setStep} step={step} /></Pressable> :
-          null }
-         { step === 1 ? 
-        <Welcome />
+          <Pressable style={styles.icon} onPress={() => setStep(step - 1)}><HomeHeader setStep={setStep} step={step} title={'Registration'} /></Pressable> :
+          step === 4 ? 
+          <Pressable style={styles.icon} onPress={() => setStep(step - 1)}><HomeHeader setStep={setStep} step={step} title={'Registration'} /></Pressable> :
+          null 
+      }
+      {
+        step === 1 ? 
+        <Slide step={step} setStep={setStep} setShowLogin={setShowLogin} />
         : step === 2 ? 
-        <SocialConnect setStep={setStep} navigation={navigation} />
+        <SocialConnect setStep={setStep} navigation={navigation} setShowLogin={setShowLogin} showLogin={showLogin} />
         : step === 3 ? 
         <AgeCountry 
           setStep={setStep} 
           navigation={navigation} 
-          date={date} 
+          date={date}
+          gender={gender}
+          setGender={setGender}
           country={country}
           setDate={setDate}
           setCountry={setCountry}
+          setValidation={setValidation}
+          validation={validation}
          />
         : step === 4 ? 
         <NameEmailPassword
           name={name}
+          surname={surname}
+          username={username}
           email={email}
           password1={password1}
           password2={password2}
           setName={setName}
+          setSurname={setSurname}
           setEmail={setEmail}
+          setUsername={setUsername}
           setPassword1={setPassword1}
           setPassword2={setPassword2}
           errorMessages={errorMessages}
           onRegistration={onRegistration}
+          validation={validation}
+          setValidation={setValidation}
+          isKeyboardVisible={isKeyboardVisible}
         />
         : step === 5 ? 
         <Complete navigation={navigation} />
         : null
         }
         { step === 1 ?
-          <ContinueButton step={step} setStep={setStep} navigation={navigation} /> : 
-          step === 2 ? 
+          null : 
+          step === 2 ?
           null : 
           step === 3 ? 
-          <ContinueButton step={step} setStep={setStep} navigation={navigation} /> :
+          !isKeyboardVisible ? <ContinueButton step={step} setStep={setStep} navigation={navigation} onContinue={onContinue}  /> : null : 
           null }
     </SafeAreaView>
   )

@@ -20,7 +20,7 @@ const completeIcon = <Svg width="180" height="180" viewBox="0 0 180 180" fill="n
       <Text style={styles.description}>Now let's move forward to create your digital NFT clone & store it on blockchain for </Text>
       <View style={styles.buttonWrapper}>
         <Pressable style={styles.button} onPress={() => props.navigation.navigate("Home")}>
-            <Text style={styles.buttonText}>Continue on your feed</Text>
+            <Text style={styles.buttonText}>Generate digital AI clone</Text>
         </Pressable>
       </View>
     </View>

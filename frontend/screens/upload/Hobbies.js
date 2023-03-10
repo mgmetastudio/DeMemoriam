@@ -1,18 +1,68 @@
-import { View, Text, StyleSheet, Pressable, TextInput, Dimensions } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, Pressable, TextInput, Dimensions, Keyboard} from 'react-native'
+import React, {useState, useEffect} from 'react'
 import { COLORS, FONTS } from "../../constants";
+import axios from 'axios';
+import { getApiConfig } from '../../functions/api';
+import * as SecureStore from 'expo-secure-store';
 
 var width = Dimensions.get('window').width - 40;
 
-const Hobbies = ({selected, hobbies, setAchievements, setOtherHobbies, achievements, otherHobbies, handleSelectItem, missing}) => {
+const Hobbies = ({selected, setAchievements, setOtherHobbies, achievements, otherHobbies, handleSelectItem, missing, setName, setGender, setUsername, setPostId}) => {
+  const hobbies = ['writing', 'painting', 'football', 'dance', 'basketball', 'shopping', 'gardening', 'drawing', 'other..'];
+
+  async function createPost () { 
+    var token = await SecureStore.getItemAsync('secure_token');
+    var create = {
+        status: 'EDITING',
+        access: 'PUBLIC',
+        collection: 'Life Story collection',
+      } 
+
+    fetch('https://api.dememoriam.ai/posts/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(create)
+      })
+      .then(response => response.json())
+      .then(data => {
+        setPostId(data.id);
+        console.log("New post's ID: ", data.id);
+      })
+      .catch((error) => {
+        console.error('Error with post saving:', error);
+      });
+  }
+
+  useEffect(() => {
+    createPost();
+  }, []);
+  
+  useEffect(() => {
+    async function createPost () {
+      const token = await SecureStore.getItemAsync('secure_token');
+      axios.get('user/profile/', getApiConfig(true, token)).then((response) => {
+        setGender(response['data'].gender);
+        setName(response['data'].first_name);
+        setUsername(response['data'].username);
+        console.log(response['data']);
+      }).catch((error) => {
+        console.log('error getting profile', error)
+      });
+    }
+    createPost();
+  }, []);
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.logo}>
-          <Text style={styles.title}>Answer few questions to {"\n"}
-          generate your AI profile.</Text>
+        <Text style={styles.title}>Answer few questions to {"\n"}
+        generate your AI profile.</Text>
       </View>
       <View style={styles.logo}>
-              <Text style={styles.title2}>What is your hobby</Text>
+        <Text style={styles.title2}>What is your hobby</Text>
       </View>
       <View style={styles.list}>
           {hobbies.map((x, key) => (
@@ -25,6 +75,7 @@ const Hobbies = ({selected, hobbies, setAchievements, setOtherHobbies, achieveme
       { selected.filter(selected => selected.includes('other..')).length > 0 ?
           <TextInput
               style={styles.input}
+              onSubmitEditing={Keyboard.dismiss}
               onChangeText={setOtherHobbies}
               value={otherHobbies}
               placeholder="Other"
@@ -34,7 +85,8 @@ const Hobbies = ({selected, hobbies, setAchievements, setOtherHobbies, achieveme
               <Text style={styles.title2}>Write your biggest achievement in your life</Text>
           </View>
           <TextInput
-              style={styles.input}
+              onSubmitEditing={Keyboard.dismiss}
+              style={styles.multiInput}
               onChangeText={setAchievements}
               value={achievements}
               placeholder="Greatest achievement"
@@ -50,9 +102,12 @@ const Hobbies = ({selected, hobbies, setAchievements, setOtherHobbies, achieveme
 export default Hobbies
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
     wrapper: {
-        marginLeft: 24,
-        marginRight: 24,
+        marginLeft: 16,
+        marginRight: 16,
     },
     logo: {
         flexDirection: "row",
@@ -118,7 +173,17 @@ const styles = StyleSheet.create({
       borderRadius: 2,
       marginBottom: 30,
     },
-    
+    multiInput: {
+      fontSize: 16,
+      fontFamily: FONTS.regular,
+      color: COLORS.gray,
+      borderWidth: 1,
+      borderColor: "rgba(65, 65, 65, 1)",
+      paddingTop: 10,
+      padding: 10,
+      borderRadius: 2,
+      marginBottom: 30,
+    },
     list: {
       display: "flex",
       flexDirection: "row",
@@ -137,6 +202,7 @@ const styles = StyleSheet.create({
       margin: 5,
       borderRadius: 15,
       flexGrow: 1,
+      width: "30%",
       textAlign: "center",
       textTransform: "capitalize",
     },
@@ -152,6 +218,7 @@ const styles = StyleSheet.create({
       margin: 5,
       borderRadius: 15,
       flexGrow: 1,
+      width: "30%",
       textAlign: "center",
       textTransform: "capitalize",
     },

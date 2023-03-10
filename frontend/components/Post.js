@@ -1,13 +1,16 @@
 import { StyleSheet, Text, View, Image, Dimensions, Alert, Pressable } from 'react-native'
 import Svg, { Path, G, Defs, Rect, ClipPath, Pattern, Circle } from 'react-native-svg';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { COLORS, FONTS } from "../constants";
+import { getApiConfig } from '../functions/api';
+import axios from "axios";
+import moment from 'moment';
 
 
 var width = Dimensions.get('window').width;
 
-const Post = ({navigation}) => {
-    const Posts = [
+const Post = ({navigation, posts}) => {
+    const dummyPosts = [
         {
           id: "NFT-01",
           owner: "Rysard",
@@ -71,20 +74,30 @@ const Post = ({navigation}) => {
         <Circle cx="16" cy="16" r="2" fill="white"/>
         <Circle cx="16" cy="22" r="2" fill="white"/>
        </Svg>
-       
-
+      
+  const getFullName = (date) => {
+    let postDate = new Date(parseFloat(date * 1000));
+    let day = postDate.getDate();
+    let month = postDate.getMonth();
+    let year = postDate.getFullYear();
+    let hours = postDate.getHours();
+    let minutes = postDate.getMinutes();
+    let seconds = postDate.getSeconds();
+    let formatedDate = moment([year, month, day, hours, minutes, seconds]).fromNow(true)
+    return formatedDate;
+  };
   return (
     <View style={styles.list}>
-        {Posts.map((x, index) => (
+        {posts.sort((a, b) => (a.date_created < b.date_created) ? 1 : -1).map((x, index) => (
             <View key={index} style={styles.postContainer}>
                 <View style={styles.postTop}>
                   <View style={styles.postTopLeft}>
                     
                     <View style={styles.details}>
-                      <Pressable onPress={() => navigation.navigate("User", x.owner)}> 
-                        <Text style={styles.owner}>{ x.owner }</Text>
+                      <Pressable onPress={() => navigation.navigate("User", x.creator)}> 
+                        <Text style={styles.owner}>{ x.owner.username }</Text>
                       </Pressable>
-                      <Text style={styles.info}>{x.date} · {x.status}</Text>
+                      <Text style={styles.info}>{getFullName(x.date_created)} · {x.access}</Text>
                     </View>
                   </View>
                   <View style={styles.postTopRight}>
@@ -94,7 +107,7 @@ const Post = ({navigation}) => {
                   </View>
                 </View>
                 <Pressable onPress={() => navigation.navigate("Post", x)}>
-                  <Image style={styles.image} source={x.image} />
+                  <Image style={styles.image} source={{ uri: x.image }} />
                 </Pressable>
             </View>
         ))}
@@ -109,6 +122,7 @@ const styles = StyleSheet.create({
     padding: 8,
     paddingTop: 0,
     backgroundColor: "rgba(11, 11, 11, 1)",
+    paddingBottom: 80,
   },
   postContainer: {
     borderColor: "rgba(65, 65, 65, 1)",

@@ -1,11 +1,35 @@
-import { View, Text, StyleSheet, Image, Dimensions, Pressable, TextInput } from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions, Pressable, TextInput, Button } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Svg, { Path, G, Defs, Rect, ClipPath } from 'react-native-svg';
 import React, { useState } from 'react'
 import { COLORS, FONTS } from "../../../constants";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function AgeCountry(props) {
+  const [datePicker, setDatePicker] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([
+    {label: 'Female', value: 'female'},
+    {label: 'Male', value: 'male'},
+    {label: 'Other', value: 'other'}
+  ]);
+  function showDatePicker() {
+    setDatePicker(true);
+  };
+ 
+  function onDateSelected(event, value) {
+    props.setDate(value);
+    setDatePicker(false);
+  };
+ 
   return (
-    <View style={styles.wrapper}>
+    <KeyboardAwareScrollView
+    resetScrollToCoords={{ x: 0, y: 0 }}
+    scrollEnabled={false}
+    contentContainerStyle={styles.container}
+    enableAutomaticScroll={true}
+  >
       <View style={styles.logo}>
           <Svg style={{ marginRight: 10 }} width="39" height="20" viewBox="0 0 39 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <Path d="M17.6825 8.76371C17.9633 8.41281 18.2425 8.05983 18.5215 7.70688C18.8168 7.33335 18.8122 6.74446 18.5116 6.37713C15.6928 2.93312 12.6185 0.00115543 8.73387 0.00115543C3.62405 0.00115543 0 4.44511 0 10.1081C0 15.5557 3.68399 20 8.31786 20C13.1899 20 16.4578 16.0577 21.2704 9.89306C23.0531 7.81417 26.5584 3.22662 30.1822 3.22662C33.2718 3.22662 35.8268 5.66383 35.6483 10.2514C35.5297 13.7636 33.3311 16.7742 30.0037 16.7742C27.1111 16.3932 25.196 14.5524 22.4042 11.251C22.0879 10.8775 21.5794 10.8888 21.2751 11.2769C20.9718 11.6642 20.6673 12.0502 20.3615 12.4345C20.0558 12.8188 20.0693 13.4309 20.3925 13.7943C24.1349 18.0054 26.8939 19.9996 30.0039 19.9996C34.8164 19.9996 38.8571 16.129 38.8571 10.036C38.8571 4.37312 35.4705 0 30.5986 0C25.8454 0 22.7561 3.72761 19.1615 8.27909C15.5665 12.8306 12.3583 16.774 8.91224 16.774C5.70373 16.774 3.26762 13.9069 3.20838 10.1794C3.14879 6.52361 5.16924 3.22608 8.43706 3.22608C11.7145 3.22608 14.3076 5.96267 16.5423 8.76263C16.8538 9.15225 17.3711 9.15225 17.6825 8.76293L17.6825 8.76371Z" fill="#75E9BB"/>
@@ -16,32 +40,88 @@ export default function AgeCountry(props) {
             <Text style={styles.title2}>Enter your date of birth & country of origin</Text>
       </View>
       <View style={styles.inputContainer}>
+      <Pressable onPress={() => showDatePicker()}>
+        <View pointerEvents="none">
+          <TextInput
+            style={styles.inputDate}
+            onChangeText={props.setDate}
+            onFocus={showDatePicker}
+            placeholder="MM/dd/year"
+            value={props.date.toDateString()}
+            keyboardType="numeric"
+            placeholderTextColor="rgba(155, 155, 155, 1)"
+          />
+        </View></Pressable>
+        <DropDownPicker
+            open={open}
+            value={props.gender}
+            items={items}
+            setOpen={setOpen}
+            setValue={props.setGender}
+            setItems={setItems}
+            placeholder="Gender"
+            zIndex={1000}
+            theme="DARK"
+            style={{
+              backgroundColor: "transparent",
+              borderColor: "rgba(65, 65, 65, 1)",
+              borderRadius: 2,
+              marginBottom: 7,
+              position: "relative",
+              zIndex: 10
+            }}
+            textStyle={{
+              fontSize: 15,
+              color: "rgba(155, 155, 155, 1)",
+              fontFamily: FONTS.regular,
+            }}
+            placeholderStyle={{
+              color: "rgba(155, 155, 155, 1)",
+              fontFamily: FONTS.regular
+            }}
+            dropDownContainerStyle={{
+              backgroundColor: "rgba(11, 11, 11, 0.8)",
+              zIndex: 10,
+              borderRadius: 0,
+            }}
+            listItemLabelStyle={{
+              color: COLORS.white,
+              fontFamily: FONTS.regular
+            }}
+      />
         <TextInput
-          style={styles.input}
-          onChangeText={props.setDate}
-          placeholder="MM/dd/year"
-          value={props.date}
-          keyboardType="numeric"
-          placeholderTextColor="rgba(155, 155, 155, 1)"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={props.setCountry}
-          value={props.country}
-          placeholder="Country"
-          placeholderTextColor="rgba(155, 155, 155, 1)"
-        />
+            style={styles.input}
+            onChangeText={props.setCountry}
+            value={props.country}
+            placeholder="Country"
+            placeholderTextColor="rgba(155, 155, 155, 1)"
+          />
       </View>
-      <View>
-            <Text style={styles.signIn}>Already have an account? <Pressable onPress={() => props.setStep(2)}><Text style={styles.signInLink}>Sign in</Text></Pressable></Text>
+      <View style={styles.MainContainer}>
+ 
+        {datePicker && (
+          <DateTimePicker
+            value={props.date}
+            mode={'date'}
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            is24Hour={true}
+            onChange={onDateSelected}
+            style={styles.datePicker}
+          />
+        )}
+ 
       </View>
-    </View>
+      { !props.validation ? <Text style={styles.error}>Please fill missing fields</Text> : null }
+    </KeyboardAwareScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginLeft: 24,
+    marginRight: 24,
+    marginTop: 30,
   },
   wrapper: {
       marginLeft: 24,
@@ -100,6 +180,7 @@ signIn: {
   fontFamily: FONTS.regular,
   color: COLORS.gray,
   textAlign: "center",
+  zIndex: 1,
 },
 signInLink: {
   fontSize: 14,
@@ -115,10 +196,43 @@ input: {
   borderColor: "rgba(65, 65, 65, 1)",
   marginBottom: 7,
   padding: 10,
+  paddingTop: 15,
+  paddingBottom: 15,
+  borderRadius: 2
+},
+inputDate: {
+  fontSize: 15,
+  fontFamily: FONTS.regular,
+  color: COLORS.gray,
+  borderWidth: 1,
+  borderColor: "rgba(65, 65, 65, 1)",
+  marginBottom: 7,
+  padding: 10,
+  paddingTop: 15,
+  paddingBottom: 15,
   borderRadius: 2
 },
 inputContainer: {
   paddingTop: 25,
   paddingBottom: 25
-}
+},
+text: {
+  color: COLORS.white
+},
+spinnerInput: {
+  fontSize: 12
+},
+ContainerStyle: {
+  backgroundColor: "green"
+},
+myDropdownContainerStyle: {
+  backgroundColor: "red"
+},
+signInContainer: {
+  position: "relative",
+  zIndex: 1
+},
+error: {
+  color: COLORS.error,
+},
 })

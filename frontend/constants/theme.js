@@ -5,7 +5,7 @@ export const COLORS = {
     gray: "rgba(155, 155, 155, 1)",
     green: "rgba(117, 233, 187, 1)",
     black: "rgba(11, 11, 11, 1)",
-    error: "#ff0033"
+    error: "rgba(235, 87, 87, 1)"
   };
   
   export const SIZES = {

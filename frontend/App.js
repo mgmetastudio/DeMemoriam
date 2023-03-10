@@ -1,6 +1,7 @@
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, TransitionPresets } from "@react-navigation/stack";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native"; 
-import { Image, Dimensions} from 'react-native';
+import { Image, Dimensions, KeyboardAvoidingView} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import React, { useState, useEffect } from 'react'
 import { useFonts } from "expo-font";
 import Registration from "./screens/registration/Registration";
@@ -39,25 +40,39 @@ const App = () => {
   useEffect(() => {
     getToken();
   }, []);
-  
+
+
+  const forFade = ({ current }) => ({
+    cardStyle: {
+      opacity: current.progress,
+    },
+  });
+
   if(!loaded) return null;
 
   return (
-    <NavigationContainer theme={theme}>
-      <Image source={require("./assets/Images/main-bg.jpg")} style={{width, height, position: "absolute"}} />
-      <Stack.Navigator 
-        screenOptions={{ 
-          headerShown: false, 
-        }} 
-        initialRouteName={tokenId ? "Home" : "Registration"} >
-        <Stack.Screen name="Registration" options={{title: 'Registration'}} component={Registration} />
-        <Stack.Screen name="Home" options={{title: 'Home'}} component={Home} />
-        <Stack.Screen name="Post" options={{title: 'Post'}} component={Post} />
-        <Stack.Screen name="User" options={{title: 'User'}} component={User} />
-        <Stack.Screen name="Upload" options={{title: 'Upload'}} component={Upload} />
-        <Stack.Screen name="Profile" options={{title: 'Profile'}} component={Profile} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer theme={theme}>
+        <Image source={require("./assets/Images/main-bg.jpg")} style={{width, height, position: "absolute"}} />
+        <Stack.Navigator 
+          screenOptions={{ 
+            headerShown: false, 
+            ...TransitionPresets.DefaultTransition,
+            cardOverlayEnabled: false,
+          }} 
+          initialRouteName={tokenId ? "Home" : "Registration"} >
+          <Stack.Screen name="Registration" options={{title: 'Registration'}} component={Registration} />
+          <Stack.Screen name="Home" options={{title: 'Home'}} component={Home} />
+          <Stack.Screen name="Post" options={{title: 'Post'}} component={Post} />
+          <Stack.Screen name="User" options={{title: 'User'}} component={User} />
+          <Stack.Screen name="Upload" options={{title: 'Upload'}} component={Upload} />
+          <Stack.Screen 
+            name="Profile" 
+            options={{
+              title: 'Profile', 
+              cardStyle: { backgroundColor: 'rgba(11, 11, 11, 1)' },
+            }} component={Profile} tokenId={tokenId} />
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
 

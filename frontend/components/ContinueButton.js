@@ -2,24 +2,14 @@ import { View, SafeAreaView, FlatList, Text, StyleSheet, Image, Pressable, Alert
 import { COLORS, FONTS } from "../constants";
 import React from 'react'
 
-var width = Dimensions.get('window').width - 40;
+var width = Dimensions.get('window').width - 32;
 
 const ContinueButton = (props) => {
   return (
-    props.step !== 8 ?
     <View style={styles.buttonWrapper}>
-        <Pressable style={styles.button} onPress={() => props.setStep(props.step + 1)}>
+        <Pressable style={styles.button} onPress={() => props.onContinue()}>
             <Text style={styles.buttonText}>
-                {props.step == 1 ? "Join now" : props.step == 7 ? "Continue to preview" : "Continue"}</Text>
-        </Pressable>
-    </View> :
-    <View style={styles.buttonWrapper2}>
-        <Pressable style={styles.button2} onPress={() => Alert.alert('Mint nft')}>
-            <Text style={styles.buttonText}>Mint NFT</Text>
-        </Pressable>
-        <Pressable style={styles.button3} onPress={() => Alert.alert('Popup saved to gallery')}>
-            <Text style={styles.buttonText2}>Save video</Text>
-            <Text style={styles.buttonTextSecondary}>Without minting</Text>
+                {props.step == 7 ? "Continue to preview" : "Continue"}</Text>
         </Pressable>
     </View>
   )
@@ -55,7 +45,7 @@ const styles = StyleSheet.create({
     },
     buttonWrapper: {
         position: 'absolute',
-        bottom: 20,
+        bottom: 40,
     },
     buttonWrapper2: {
         position: 'absolute',

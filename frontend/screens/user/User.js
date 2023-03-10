@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Image, Pressable } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import Svg, { Path, Rect } from 'react-native-svg'
 import { COLORS, FONTS } from '../../constants';
@@ -7,6 +7,7 @@ import { getApiConfig } from '../../functions/api';
 import axios from "axios";
 import NoPosts from './NoPosts';
 import PostsFeed from './PostsFeed';
+import * as SecureStore from 'expo-secure-store';
 
 const add = <Svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
 <Path d="M16.1793 9.78746C16.0176 9.78751 15.8626 9.85171 15.7483 9.96606C15.634 10.0804 15.5698 10.2354 15.5698 10.3971L15.5698 15.3908L10.576 15.3908C10.3585 15.3911 10.1575 15.5073 10.0487 15.6958C9.94005 15.8842 9.94005 16.1164 10.0487 16.3049C10.1575 16.4934 10.3585 16.6096 10.576 16.6099L15.5698 16.6099L15.5698 21.6036C15.5701 21.8212 15.6863 22.0222 15.8748 22.1309C16.0632 22.2396 16.2954 22.2396 16.4839 22.1309C16.6724 22.0222 16.7886 21.8212 16.7889 21.6036L16.7889 16.6099L21.7826 16.6099C22.0002 16.6096 22.2012 16.4934 22.3099 16.3049C22.4186 16.1164 22.4186 15.8842 22.3099 15.6958C22.2012 15.5073 22.0002 15.3911 21.7826 15.3908H16.7889L16.7889 10.3971C16.7889 10.2354 16.7247 10.0804 16.6104 9.96606C16.496 9.85171 16.341 9.78747 16.1793 9.78746L16.1793 9.78746Z" fill="#75E9BB"/>
@@ -27,12 +28,21 @@ const User = ({ navigation, route }) => {
   const [user, setUser] = useState('');
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
-  const [avatar, setAvatar] = useState(require('../../assets/Images/default-user.jpg'));
+  const [avatar, setAvatar] = useState(null);
   const [description, setDescription] = useState('This is my profile on DeMemoriam social platform');
   const [posts, setPosts] = useState();
+  const [myPosts, setMyPosts] = useState();
+  const [token, setToken] = useState('');
+  const defaultImage = require('../../assets/Images/default-user.jpg');
+  async function getToken() {
+    const token = await SecureStore.getItemAsync('secure_token');
+    setToken(token);
+  }
+  getToken();
 
   useEffect(() => {
-    axios.get(`user/profile/${route.params ? route.params : ''}`, getApiConfig()).then((response) => {
+    axios.get(`/user/profile/${route.params ? route.params : ''}`, getApiConfig(false)).then((response) => {
+      console.log('Profile: ', response['data'])
       if(response['data'].about_me) {
         setPosts(JSON.parse(response['data'].about_me));
       }
@@ -46,19 +56,27 @@ const User = ({ navigation, route }) => {
       console.log('error getting profile', error)
     });
   }, []);
+  useEffect(() => {
+    axios.get(`/posts/`, getApiConfig(true, token)).then((response) => {
+      console.log('Responce: ', response['data'].results);
+      setMyPosts(response['data'].results);
+    }).catch((error) => {
+      console.log('Error getting profile:', error)
+    });
+  }, [token]);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.userHeader}>
-        <Text style={styles.userName}> {name ? `${name} ${surname}`: user} { approved }</Text>
+        <Text style={styles.userName}> {user} { approved }</Text>
         <View style={styles.userHeaderRight}>
-          <View>{ add }</View>
-          <View>{ burger }</View>
+          <Pressable style={styles.add} onPress={() => navigation.navigate("Upload")}><View>{ add }</View></Pressable>
+          <Pressable onPress={() => navigation.navigate("Profile")}><View>{ burger }</View></Pressable>
         </View>
       </View>
       <View style={styles.userInfo}>
         <View style={styles.userInfoLeft}>
-          <Image style={styles.image} source={avatar} />
+          <Image style={styles.image} source={avatar ? { uri: avatar , width: 65, height: 65, } : defaultImage}  />
         </View>
         <View style={styles.userInfoRight}>
           <View style={styles.userInfoFlex}>
@@ -71,18 +89,18 @@ const User = ({ navigation, route }) => {
           </View>
           <View style={styles.userInfoFlex}>
             <Text style={styles.text}>0</Text>
-            <Text style={styles.text}>Tops</Text>
+            <Text style={styles.text}>Tips</Text>
           </View>
         </View>
       </View>
       <View style={styles.userInfoBottom}>
-        <Text style={styles.userNameGreen}>{ user }</Text>
+        <View style={styles.align}><Text style={styles.userNameGreen}>{name ? `${name} ${surname}`: user}</Text></ View>
         <Text style={styles.userDescription}>{ description }</Text>
       </View>
       <View style={styles.body}>
-        { posts ? <PostsFeed posts={posts} /> : <NoPosts navigation={navigation} /> }
+        { myPosts ? <PostsFeed navigation={navigation} myPosts={myPosts} /> : <NoPosts navigation={navigation} /> }
       </View>
-      <BottomBar navigation={navigation} />
+      <BottomBar navigation={navigation} avatar={avatar} />
     </SafeAreaView>
   )
 }
@@ -104,6 +122,7 @@ const styles = StyleSheet.create({
     color: COLORS.green,
     fontFamily: FONTS.regular,
     fontSize: 14,
+    paddingRight: 5,
     paddingBottom: 3,
   },
   userDescription: {
@@ -124,6 +143,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     gap: 15
+  },
+  add: {
+    paddingRight: 10
+  },
+  align: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
   },
   image: {
     width: 60,

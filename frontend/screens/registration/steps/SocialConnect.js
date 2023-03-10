@@ -32,18 +32,13 @@ const linkedinIcon = <Svg width="20" height="20" viewBox="0 0 20 20" fill="none"
 </ClipPath>
 </Defs>
 </Svg>;
-const emailIcon = <Svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<Path fill-rule="evenodd" clip-rule="evenodd" d="M12.6927 10.4875L18.0529 6.03415V14.9412L12.6927 10.4875ZM8.38641 11.2264L2.83624 15.8382H17.3532L11.803 11.2264L11.2524 11.6841C10.9271 11.9542 10.5175 12.1022 10.0946 12.1022C9.67161 12.1022 9.26207 11.9542 8.93673 11.6841L8.38614 11.2266L8.38641 11.2264ZM7.49711 10.4875L2.13688 14.9409V6.03381L7.49711 10.4872V10.4875ZM10.5264 10.8095L17.3531 5.13691H2.83614L9.66311 10.8095C9.78364 10.9117 9.93659 10.9679 10.0946 10.9679C10.2527 10.9679 10.4056 10.9117 10.5261 10.8095H10.5264ZM17.3777 4H2.81179C2.33138 4.00054 1.87096 4.19165 1.53115 4.53129C1.19151 4.87107 1.00051 5.33152 1 5.81193V15.163C1.00054 15.6434 1.19152 16.104 1.53115 16.4438C1.87093 16.7834 2.33138 16.9745 2.81179 16.9752H17.3777C17.8581 16.9745 18.3186 16.7834 18.6584 16.4438C18.998 16.104 19.189 15.6434 19.1895 15.163V5.81193C19.189 5.33152 18.998 4.8711 18.6584 4.53129C18.3186 4.19165 17.8581 4.00055 17.3777 4Z" fill="#75E9BB"/>
-</Svg>
-
-
-
- 
+const emailIcon = ''
 
 
 
 
-const SocialConnect = (props) => {
+
+const SocialConnect = ({navigation, setStep, showLogin, setShowLogin}) => {
 
   const [email, setEmail] = useState('andriuskevicius.ernestas@gmail.com');
   const [password, setPassword] = useState('darvienas');
@@ -60,7 +55,9 @@ const SocialConnect = (props) => {
       .then((response) => {
         const data = response.data;
         save('secure_token', data.access_token);
+        save('username', data.username);
         setErrorMessages('');
+        navigation.navigate("Home");
       }).catch((error) => {
         setErrorMessages('Email or password was incorect, try again.');
         console.log("Login error", error);
@@ -69,9 +66,6 @@ const SocialConnect = (props) => {
   async function save(key, value) {
     await SecureStore.deleteItemAsync(key)
     await SecureStore.setItemAsync(key, value);
-    const token = await SecureStore.getItemAsync('secure_token');
-    console.log("Čia jau išsaugotas: ", token);
-    props.navigation.navigate("Home");
   }
 
   return (
@@ -83,23 +77,24 @@ const SocialConnect = (props) => {
           <Text style={styles.title}>DeMemoriam</Text>
       </View>
       <View>
-            <Text style={styles.title2}>Welcome back</Text>
+            <Text style={styles.title2}>{ showLogin ? 'Welcome back' : 'Digital clone in a matter of minutes'}</Text>
       </View>
+      { !showLogin ? <Text style={styles.title3}>With a help of AI, create your speaking NFT twin and leave your digital footprint for future generations</Text> : null }
       <View style={styles.buttonsWrapper}>
-        <Pressable style={styles.button} onPress={() => props.setStep(3)}>
-            <Text style={styles.buttonText}>{ googleIcon }Sign up with Google</Text>
+        <Pressable style={styles.button} onPress={e => setShowLogin(true)}>
+          { googleIcon }<Text style={styles.buttonText}>Sign in with Google</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => props.setStep(3)}>
-            <Text style={styles.buttonText}>{ facebookIcon }Sign up with Google</Text>
+        <Pressable style={styles.button} onPress={e => setShowLogin(true)}>
+          { facebookIcon }<Text style={styles.buttonText}>Sign in with Google</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => props.setStep(3)}>
-            <Text style={styles.buttonText}>{ linkedinIcon }Sign up with LinkedIn</Text>
+        <Pressable style={styles.button} onPress={e => setShowLogin(true)}>
+          { linkedinIcon }<Text style={styles.buttonText}>Sign in with LinkedIn</Text>
         </Pressable>
-        <Pressable style={styles.buttonSign} onPress={() => props.setStep(3)}>
-            <Text style={styles.buttonEmailText}>Sign in with email</Text>
+        <Pressable style={[styles.buttonSign, showLogin ? styles.active : null]} onPress={e => setShowLogin(!showLogin)}>
+            { emailIcon }<Text style={[styles.buttonEmailText, showLogin ? styles.active : null]}>Sign in with email</Text>
         </Pressable>
       </View>
-      <View>
+      { showLogin ? <View>
       <TextInput
           style={styles.input}
           onChangeText={setEmail}
@@ -118,21 +113,30 @@ const SocialConnect = (props) => {
           placeholderTextColor="rgba(155, 155, 155, 1)"
           value={password} 
         />
-      </View>
-      <Text style={styles.errorMessage}>{ errorMessages }</Text>
-      <Pressable style={styles.forgot} onPress={() => props.setStep(3)}>
+        <Pressable style={styles.forgot} onPress={() => setStep(3)}>
           <Text style={styles.forgotText}>Forgot password</Text>
-      </Pressable>
-      <Pressable style={styles.buttonSign} onPress={e => Login(e)}>
-            <Text style={styles.buttonSignText}>Sign in</Text>
         </Pressable>
+      </View> : null }
+      <Text style={styles.errorMessage}>{ errorMessages }</Text>
+      { showLogin ? 
+      <Pressable style={styles.buttonSign2} onPress={e => Login(e)}>
+        <Text style={styles.buttonSignText}>Sign in</Text>
+      </Pressable> : null }
       <View>
-            <Text style={styles.signIn}>Don't have account?
-            
-            <Pressable onPress={() => props.setStep(3)}>
-              <Text style={styles.signInLink}>Sign up</Text>
-            </Pressable>
-            </Text>
+        { showLogin ?
+        <View style={styles.flexRow}> 
+          <Text style={styles.signIn}>Don't have account?</Text> 
+          <Pressable onPress={() => setStep(3)}>
+            <Text style={styles.signInLink}>Sign up</Text>
+          </Pressable>
+        </View> : 
+        <View style={styles.flexRow}>
+          <Text style={styles.signIn}>Already have an account?</Text>
+          <Pressable onPress={e => setShowLogin(true)}>
+            <Text style={styles.signInLink}>Sign in</Text>
+          </Pressable>
+        </View>
+        }
       </View>
     </View>
   )
@@ -193,7 +197,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 4
 },
-  paragraph: {
+title3: {
+  color: COLORS.gray,
+  fontFamily: FONTS.regular,
+  fontSize: 14,
+  textAlign: "center",
+  paddingTop: 10
+},
+paragraph: {
     fontSize: 12,
     fontFamily: FONTS.regular,
     color: COLORS.gray,
@@ -207,7 +218,8 @@ button: {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  padding: 10
+  padding: 12,
+  flexDirection: "row",
 },
 buttonText: {
   color: COLORS.white,
@@ -216,8 +228,27 @@ buttonText: {
   textAlign: "center",
   justifyContent: "center",
   alignItems: "center",
+  marginLeft: 7,
+},
+buttonEmailText: {
+  color: COLORS.white,
+  fontFamily: FONTS.regular,
+  fontSize: 14,
+  textAlign: "center",
+  justifyContent: "center",
+  alignItems: "center",
 },
 buttonSign: {
+  borderWidth: 1,
+  borderColor: "rgba(65, 65, 65, 1)",
+  marginBottom: 7,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: 10,
+  marginBottom: 30
+},
+buttonSign2: {
   borderWidth: 1,
   borderColor: COLORS.green,
   marginBottom: 7,
@@ -230,14 +261,6 @@ buttonSign: {
 buttonSignText: {
   color: COLORS.green,
   fontFamily: FONTS.preety,
-  fontSize: 14,
-  textAlign: "center",
-  justifyContent: "center",
-  alignItems: "center",
-},
-buttonEmailText: {
-  color: COLORS.green,
-  fontFamily: FONTS.regular,
   fontSize: 14,
   textAlign: "center",
   justifyContent: "center",
@@ -258,6 +281,15 @@ signInLink: {
   fontFamily: FONTS.regular,
   color: COLORS.green,
   textAlign: "center",
+  marginLeft: 4
+},
+active: {
+  color: COLORS.green,
+  borderColor: COLORS.green,
+},
+flexRow: {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
 }
-
 })

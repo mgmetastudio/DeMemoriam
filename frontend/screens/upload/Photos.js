@@ -1,8 +1,11 @@
-import { View, Text, StyleSheet, Image, Dimensions, Pressable, TextInput, Alert } from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions, Pressable, TextInput, Alert, Platform } from 'react-native'
 import Svg, { Path, G, Defs, Rect, ClipPath } from 'react-native-svg';
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { COLORS, FONTS } from "../../constants";
+import Constants from "expo-constants";
 import * as ImagePicker from 'expo-image-picker';
+import axios from "axios"
+import * as SecureStore from 'expo-secure-store';
 
 const cancel = 
 <Svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -10,23 +13,70 @@ const cancel =
 </Svg>
 
 
-const Photos = ({image, setImage, missing}) => {
+const Photos = ({image, setImage, missing, setUploadedImage, postId}) => {
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
 
   const pickImage = async () => {
-    console.log('image upload function');
-    // No permissions request is necessary for launching the image library
+    var token = await SecureStore.getItemAsync('secure_token');
+    console.log('image upload function started.');
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [3, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      console.log(result.assets[0].uri);
+      console.log("Image data from phone: ", result.assets[0]);
       setImage(result.assets[0].uri);
-    }
+      const form = new FormData();
+      form.append('image', {
+        uri: result.assets[0].uri,
+        type: 'image/jpeg',
+        name: `${getRandomInt(100000)}-animated-nft.jpeg`,
+      });
+      console.log("Image url from phone: ", form);
+      console.log(`https://api.dememoriam.ai/posts/${postId}/image/`);
+
+      fetch(
+        `https://api.dememoriam.ai/posts/${postId}/image/`,
+        {
+          method: 'PUT',
+          headers: {
+            'authorization': `Bearer ${token}`,
+          },
+          body: form,
+        }
+      )
+        .then(response => response.json())
+        .then((result) => {
+          setUploadedImage(result.image);
+          console.log('Result:', result.image);
+        })
+        .catch((error) => {
+          console.error('Error with image:', error);
+        });
+      }
   };
+
+  useEffect(() => {
+    (async () => {
+      if (Constants.platform.ios) {
+        const cameraRollStatus =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const cameraStatus = await ImagePicker.requestCameraPermissionsAsync();
+        if (
+          cameraRollStatus.status !== "granted" ||
+          cameraStatus.status !== "granted"
+        ) {
+          alert("Sorry, we need these permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
 
   return (
     <View style={styles.wrapper}>

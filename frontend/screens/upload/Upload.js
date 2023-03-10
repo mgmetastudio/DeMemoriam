@@ -1,15 +1,22 @@
-import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, Pressable, TextInput, Alert, ActivityIndicator, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback  } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import React, { useState, useEffect } from 'react'
 import { COLORS, FONTS } from "../../constants";
 import HomeHeader from "../../components/HomeHeader"
 import Hobbies from "./Hobbies"
 import Photos from "./Photos"
+import Collection from "./Collection"
 import Edit from './Edit'
 import Preview from './preview/Preview'
+import Notification from './Notification'
 import axios from "axios"
 import * as SecureStore from 'expo-secure-store';
 
 var width = Dimensions.get('window').width - 40;
+var width2 = Dimensions.get('window').width;
+var height = Dimensions.get('window').height;
+
+var buttonHeight = Platform.OS === 'ios' ? height : height + 70;
 
 const Upload = ({ navigation }) => {
 
@@ -21,12 +28,26 @@ const Upload = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [genereatedId, setGeneratedId] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [loadingIcon, setLoadingIcon] = useState(false);
   const [token, setToken] = useState('');
   const [missing, setMissing] = useState('');
-
-  const hobbies = ['writing', 'painting', 'sports', 'cooking', 'dance', 'learning', 'shopping', 'gardening', 'drawing', 'other..'];
+  const [owner, setOwner] = useState('');
+  const [animatedImage, setAnimatedImage] = React.useState('');
+  const [animatedVideo, setAnimatedVideo] = React.useState('');
+  const [uploadedImage, setUploadedImage] = React.useState('');
+  const [generatedId, SetGeneratedId] = React.useState('');
+  const [generatingTimer, setGeneratingTimer] = React.useState(false);
   const [selected, setSelected] = useState([]);
+  const [name, setName] = useState();
+  const [username, setUsername] = useState();
+  const [gender, setGender] = useState();
+  const [collection, setCollection] = useState(false);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [allow, setAllow] = useState(false);
+  const [postId, setPostId] = useState();
+  const [formImage, setFormImage] = useState(null);
+  const [enabled, setEnabled] = useState(false);
+  const [error, setError] = useState('');
+  const [notificationText, setNotificationText] = useState('')
 
   const handleSelectItem = (itemId, item) => {
     if (selected.filter(selected => selected.includes(item)).length > 0) {
@@ -35,19 +56,53 @@ const Upload = ({ navigation }) => {
     } else  {
       setSelected(current => [...current, item]);
     }
-    console.log("Hobbies:", selected)
   }
+
+  const handleSelectCollection = () => {
+    setCollection(!collection);
+    setAllow(!allow);
+  }
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
 
   const setAction = () => {
     if(step === 1) {
-      if(!hobbies || !achievements) {
-        setMissing('Please fill both fields hobbies and achievements')
+      if(collection) {
+        setError('');
+        setStep(step + 1);
+        setEnabled(false);
       } else {
-        setMissing('')
-        setStep(step + 1)
+        setError('Please select collection to continue')
       }
     }
     else if(step === 2) {
+      if(!selected || !achievements) {
+        setMissing('Please fill both fields hobbies and achievements')
+      } else {
+        setMissing('')
+        setStep(step + 1);
+      }
+    }
+    else if(step === 3) {
       if(!image) {
         setMissing('Please select image to upload first')
       } else {
@@ -55,131 +110,224 @@ const Upload = ({ navigation }) => {
         setStep(step + 1)
       }
     }
-    else if(step === 3) {
-      generateDID();
+    else if(step === 4) {
+      generateAnimation();
       setStep(step + 1)
     } else {
       setStep(step + 1)
     }
   }
 
-  const optionsGenerate = {
-    method: 'POST',
-    url: 'https://api.d-id.com/talks',
-    headers: {
-      accept: 'application/json',
-      'content-type': 'application/json',
-      authorization: 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik53ek53TmV1R3ptcFZTQjNVZ0J4ZyJ9.eyJodHRwczovL2QtaWQuY29tL2ZlYXR1cmVzIjoidGFsa3MiLCJpc3MiOiJodHRwczovL2F1dGguZC1pZC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDAxMjYxNjQ1ODk1NzcyNTQ2OTEiLCJhdWQiOlsiaHR0cHM6Ly9kLWlkLnVzLmF1dGgwLmNvbS9hcGkvdjIvIiwiaHR0cHM6Ly9kLWlkLnVzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2Nzc0OTA0OTgsImV4cCI6MTY3NzU3Njg5OCwiYXpwIjoiR3pyTkkxT3JlOUZNM0VlRFJmM20zejNUU3cwSmxSWXEiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIHJlYWQ6Y3VycmVudF91c2VyIHVwZGF0ZTpjdXJyZW50X3VzZXJfbWV0YWRhdGEgb2ZmbGluZV9hY2Nlc3MifQ.XKUfMuHruSJS2Uy665uDTf1ZZqPgIj6pjOuUJc-DLHgxgxfwnq9X9ZBfmbhiBoeau1udedyTKMSa6k0GmOWypAxlgco-gauLV57B4HiMxDsOy03b3KTJfUQlVCy5Fyk75xKsmMwt25JXQSuxB-a2E1sm1ag-tfp9bOYryBJxl2RMGZXLcV98tx3uD0VANAPCSL0b59nBT4Wt1iUbn1epvk7AfSnLtXAnRbh0JBVpnM51Z8vXqffSmu8v5YYhmyOfHr3ssW803q24P5Ff8ghdj16OhbIyRdDVMdop83a2hYNOjhrWUsbddCrCoA7bSiAQhB4mmzHnrSqCWhZjhgQWyg9'
-    },
-    data: {
-      script: {
-        type: 'text',
-        provider: {type: 'microsoft', voice_id: 'Jenny'},
-        ssml: 'false',
-        input: 'I\'m testing this API!'
+  async function getToken() {
+    const token = await SecureStore.getItemAsync('secure_token');
+    const owner = await SecureStore.getItemAsync('username');
+    setToken(token);
+    setOwner(owner);
+  }
+
+  const generateAnimation = () => {
+    const optionsGenerate = {
+      method: 'POST',
+      url: 'https://api.d-id.com/talks',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        authorization: 'Basic '
       },
-      config: {fluent: 'false', pad_audio: '0.0'},
-      source_url: 'https://i.pinimg.com/originals/d6/a9/57/d6a957f1d8045c9c973c12bf5968326f.jpg'
-    }
-  };
-
-  const optionsShow = {
-    method: 'GET',
-    url: `https://api.d-id.com/talks/tlk_iEJM8at0UneNwtwgePhVk`,
-    headers: {
-      accept: 'application/json',
-      authorization: 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik53ek53TmV1R3ptcFZTQjNVZ0J4ZyJ9.eyJodHRwczovL2QtaWQuY29tL2ZlYXR1cmVzIjoidGFsa3MiLCJpc3MiOiJodHRwczovL2F1dGguZC1pZC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMDAxMjYxNjQ1ODk1NzcyNTQ2OTEiLCJhdWQiOlsiaHR0cHM6Ly9kLWlkLnVzLmF1dGgwLmNvbS9hcGkvdjIvIiwiaHR0cHM6Ly9kLWlkLnVzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2Nzc0OTA0OTgsImV4cCI6MTY3NzU3Njg5OCwiYXpwIjoiR3pyTkkxT3JlOUZNM0VlRFJmM20zejNUU3cwSmxSWXEiLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIHJlYWQ6Y3VycmVudF91c2VyIHVwZGF0ZTpjdXJyZW50X3VzZXJfbWV0YWRhdGEgb2ZmbGluZV9hY2Nlc3MifQ.XKUfMuHruSJS2Uy665uDTf1ZZqPgIj6pjOuUJc-DLHgxgxfwnq9X9ZBfmbhiBoeau1udedyTKMSa6k0GmOWypAxlgco-gauLV57B4HiMxDsOy03b3KTJfUQlVCy5Fyk75xKsmMwt25JXQSuxB-a2E1sm1ag-tfp9bOYryBJxl2RMGZXLcV98tx3uD0VANAPCSL0b59nBT4Wt1iUbn1epvk7AfSnLtXAnRbh0JBVpnM51Z8vXqffSmu8v5YYhmyOfHr3ssW803q24P5Ff8ghdj16OhbIyRdDVMdop83a2hYNOjhrWUsbddCrCoA7bSiAQhB4mmzHnrSqCWhZjhgQWyg9'
-    }
-  };
-
-  const showDID = async () => {
-  axios
-    .request(optionsShow)
+      data: {
+        script: {
+          type: 'text',
+          provider: {type: 'microsoft', voice_id: gender === 'male' ? 'Eric' : "Jenny" },
+          ssml: 'false',
+          input: result
+        },
+        config: {fluent: 'false', pad_audio: '0.0'},
+        source_url: uploadedImage
+      }
+    };
+    axios
+    .request(optionsGenerate)
     .then(function (response) {
+      SetGeneratedId(response.data.id);
+      console.log("Getting new generated video ID:", response.data.id);
       console.log(response.data);
+      displayVideo(response.data.id);
+      setNotificationText('Currently we are generating your avatar video. Will let you know whens its done.')
+      setGeneratingTimer(true);
     })
     .catch(function (error) {
       console.error(error);
     });
-  }
-  function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-  }
+  };
 
-  const generateDID = async () => {
+  const displayVideo = (id) => {
+    setTimeout(() => {
+    console.log("Passing new generated video ID:", id);
+    console.log(`New url looks like this https://api.d-id.com/talks/${id}`)
+    const options = {
+      method: 'GET',
+      url: `https://api.d-id.com/talks/${id}`,
+      headers: {
+        accept: 'application/json',
+        authorization: 'Basic '
+      }
+    };
+    
     axios
-      .request(optionsGenerate)
+      .request(options)
       .then(function (response) {
-        console.log(response.data);
-        setGeneratedId(response.data.id)
+        console.log("This main data:", response.data);
+        setAnimatedImage(response.data.source_url);
+        setAnimatedVideo(response.data.result_url);
+        console.log("Video:", animatedVideo, "Image", animatedImage);
+        setGeneratingTimer(false);
       })
       .catch(function (error) {
         console.error(error);
       });
+    }, 30000);
   }
-  const aboutMe = {
-      id: `NFT-${getRandomInt(100000)}`,
-      owner: "Rysard",
-      creator: "Rysard Gvozdovic",
-      status: "Public",
-      date: "12h",
-      contract: "15rfe32f233f2cse...",
-      blockchain: "Flow",
-      standard: "ERC-721",
-      collection: "Life Story collection",
-      description: result,
-      image: image,
-  }
-  const saveToBackend = () => {
-    setLoading(true);
-        var edit = {
-            about_me: JSON.stringify(aboutMe),
-          } 
-        console.log('Edit: ', edit)
-        fetch('https://api.dememoriam.ai/user/profile/', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(edit)
-        })
-        .then(response => response.json())
-        .then(data => {
-          setModalVisible(true);
-          setLoading(false);
-          console.log("Profile data: ", data);
-        })
-  }
-  async function getToken() {
-    const token = await SecureStore.getItemAsync('secure_token');
-    setToken(token);
-  }
+
   useEffect(() => {
     getToken();
   }, []);
 
+  // Refresh continue button status on options selected.
+
+  useEffect(() => {
+    if(step === 1) {
+      if(collection) {
+        setEnabled(true);
+        setError('');
+      } else {
+        setEnabled(false);
+      }
+    } else if(step === 2) {
+      if(selected.length !== 0 && achievements) {
+        setEnabled(true);
+      } else {
+        setEnabled(false);
+      }
+    } else if(step === 3) {
+      if(setUploadedImage != '') {
+        setEnabled(true);
+        setMissing('');
+      } else {
+        setEnabled(false);
+      }
+
+    }
+  }, [collection, selected, achievements, setUploadedImage]);
+
+
+  console.log('Button status active: ', enabled)
+
+  const saveImage = async () => {
+      fetch(
+        `https://api.dememoriam.ai/posts/${id}/`,
+        {
+          method: 'PUT',
+          headers: {
+            'authorization': `Bearer ${token}`,
+          },
+          body: formImage,
+        }
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+        })
+        .catch((error) => {
+          console.error('Error with image:', error);
+        });
+  };
+  const saveToBackend = () => {
+    console.log('Minting video');
+    setGeneratingTimer(true);
+    setNotificationText('Currently we are minting your avatar. Will let you know when it`s done.');
+    uploadVideoToServer();
+  }
+
+  const uploadVideoToServer = async () => {
+    var token = await SecureStore.getItemAsync('secure_token');
+      console.log('Video upload Started...');
+      const form = new FormData();
+      form.append('video', {
+        uri: animatedVideo,
+        type: 'video/mp4',
+        name: `${postId}-animated-nft.mp4`,
+      });
+      console.log("Video url from form: ", form);
+      fetch(
+        `https://api.dememoriam.ai/posts/${postId}/video/`,
+        {
+          method: 'PUT',
+          headers: {
+            'authorization': `Bearer ${token}`,
+          },
+          body: form,
+        }
+      )
+        .then(response => response.json())
+        .then((result) => {
+          console.log('Video successfuly uploaded:', result);
+          setModalVisible(true);
+          setGeneratingTimer(false);
+        })
+        .catch((error) => {
+          console.error('Error with video:', error);
+        });
+  };
+  
   return (
+    <KeyboardAwareScrollView
+      enableOnAndroid={true}
+      enableAutomaticScroll={(Platform.OS === 'ios')}
+      extraScrollHeight={Platform.OS === 'ios' ? 0 : 50}
+      extraHeight={Platform.OS === 'ios' ? 0 : 50}
+    >
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <SafeAreaView style={styles.container}>
-            <HomeHeader title={step === 1 ? "What are your thoughts" : "Upload your looks"} step={step} setStep={setStep} navigation={navigation} />
-            { step === 1 ? 
+            <HomeHeader title={
+              step === 1 ? "Collection selection" :
+              step === 2 ? "What are your thoughts" :
+              step === 3 ?  "Upload your looks" :
+              step === 4 ? "Edit transcript & voice" :
+              step === 5 ? "Preview" : null } step={step} setStep={setStep} navigation={navigation} />
+            { generatingTimer ? <Notification notificationText={notificationText} /> : null }
+                {step === 1 ? 
+                  <Collection 
+                    collection={collection}
+                    setCollection={setCollection}
+                    handleSelectCollection={handleSelectCollection}
+                    error={error}
+                  /> :  
+                step === 2 ? 
                 <Hobbies 
                     handleSelectItem={handleSelectItem}
                     achievements={achievements}
                     otherHobbies={otherHobbies}
                     setAchievements={setAchievements}
                     setOtherHobbies={setOtherHobbies}
-                    hobbies={hobbies}
                     selected={selected}
                     missing={missing}
+                    setName={setName}
+                    setGender={setGender}
+                    setUsername={setUsername}
+                    isKeyboardVisible={isKeyboardVisible}
+                    setKeyboardVisible={setKeyboardVisible}
+                    setPostId={setPostId}
                 /> : 
-                step === 2 ?
+                step === 3 ?
                 <Photos
                     image={image}
                     setImage={setImage} 
                     missing={missing}
+                    setUploadedImage={setUploadedImage}
+                    setFormImage={setFormImage}
+                    postId={postId}
                 /> :
-                step === 3 ?
+                step === 4 ?
                 <Edit 
                     result={result} 
                     setResult={setResult} 
@@ -189,37 +337,48 @@ const Upload = ({ navigation }) => {
                     otherHobbies={otherHobbies} 
                     loading={loading}
                     setLoading={setLoading}
+                    name={name}
+                    username={username}
+                    gender={gender}
+                    setPostId={setPostId}
+                    saveImage={saveImage}
+                    postId={postId}
                   />
                 :
-                step === 4 ?
+                step === 5 ?
                 <Preview 
                     selected={selected} 
                     image={image} 
                     result={result} 
-                    showDID={showDID}
                     modalVisible={modalVisible}
                     setModalVisible={setModalVisible}
                     navigation={navigation}
+                    genereatedId={genereatedId}
+                    animatedImage={animatedImage}
+                    animatedVideo={animatedVideo}
+                    setAnimatedImage={setAnimatedImage}
+                    setAnimatedVideo={setAnimatedVideo}
+                    uploadedImage={uploadedImage}
+                    loading={loading}
                 />
                 : null
             }
-        { step !== 4 ?
+        { step !== 5 ?
+            !isKeyboardVisible ? 
             <View style={styles.buttonWrapper}>
-                <Pressable style={styles.button} onPress={() => setAction()}>
-                    <Text style={styles.buttonText}>Continue</Text>
+                <Pressable style={[styles.button, enabled ? styles.activeButton : null]} onPress={() => setAction()}>
+                    <Text style={[styles.buttonText, enabled ? styles.activeButton : null]}>Continue</Text>
                 </Pressable>
-            </View> :
+            </View> : null :
             <View style={styles.buttonWrapper2}>
                 <Pressable style={styles.button2} onPress={() => saveToBackend()}>
                     <Text style={styles.buttonText}>Mint NFT {loading ? <ActivityIndicator size="small" color={COLORS.green} /> : null}</Text>
                 </Pressable>
-                <Pressable style={styles.button3} onPress={() => Alert.alert('Popup saved to gallery')}>
-                    <Text style={styles.buttonText2}>Save video</Text>
-                    <Text style={styles.buttonTextSecondary}>Without minting</Text>
-                </Pressable>
             </View>
         }
         </SafeAreaView>
+        </TouchableWithoutFeedback>
+      </KeyboardAwareScrollView>
   )
 }
 
@@ -227,7 +386,7 @@ export default Upload
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: buttonHeight
   },
   wrapper: {
       marginLeft: 24,
@@ -286,15 +445,19 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: COLORS.green,
+    borderColor: COLORS.gray,
     alignSelf: 'stretch',
     textAlign: 'center',
     width: width,
     marginLeft: 16,
 },
+activeButton: {
+  borderColor: COLORS.green,
+  color: COLORS.green,
+},
 buttonText: {
     fontFamily: FONTS.preety,
-    color: COLORS.green,
+    color: COLORS.gray,
     fontSize: 16
 },
 buttonText2: {
@@ -312,6 +475,7 @@ buttonWrapper2: {
     paddingTop: 20,
     bottom: 45,
     flexDirection: "row",
+    backgroundColor: "rgba(11, 11, 11, 1)",
     borderTopWidth: 1,
     borderTopColor: "rgba(65, 65, 65, 1)"
     
@@ -325,10 +489,11 @@ button2: {
     elevation: 3,
     borderWidth: 1,
     borderColor: COLORS.green,
+    width: width2 -32,
     alignSelf: 'stretch',
     textAlign: 'center',
-    width: width / 2,
     marginLeft: 16,
+    marginRight: 16,
 },
 button3: {
     alignItems: 'center',

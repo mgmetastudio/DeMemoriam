@@ -30,7 +30,7 @@ const PopupSuccess = ({setModalVisible, modalVisible, navigation}) => {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <View style={styles.svgContainer}>{ success }</View>
-            <Text style={styles.modalText}>Your video was successfully {"\n"} saved to gallery</Text>
+            <Text style={styles.modalText}>Your video was successfully {"\n"} saved to blockchain</Text>
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => closed()}>

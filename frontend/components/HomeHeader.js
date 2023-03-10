@@ -22,7 +22,7 @@ const HomeHeader = (props) => {
           </Svg>
         </View>
       </Pressable>
-      <Text style={styles.text}>{props.step < 5 ? "Registration" : props.title}</Text>
+      <Text style={styles.text}>{props.title}</Text>
     </View>
   )
 }

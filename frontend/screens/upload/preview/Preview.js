@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Dimensions, TextInput, Pressable, Alert, Button, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Image, Dimensions, TextInput, Pressable, Alert, Button, ActivityIndicator, ScrollView } from 'react-native'
 import React, {useState, useEffect} from 'react'
 import { COLORS, FONTS } from "../../../constants";
 import Svg, { Path, G, Defs, Rect, ClipPath } from 'react-native-svg';
@@ -14,54 +14,17 @@ const play = <Svg style={{marginLeft: 3}} width="15" height="18" viewBox="0 0 15
 <Path d="M14.75 9L0.124999 17.4437L0.125 0.556252L14.75 9Z" fill="#75E9BB"/>
 </Svg>
 
-const preview = ({image, result, showDID, modalVisible, setModalVisible, navigation }) => {
-  const video = React.useRef(null);
-  const [loading, setLoading] = React.useState(false);
-
-  const generateAnimation = () => {
-    setLoading(true);
-    const optionsGenerate = {
-      method: 'POST',
-      url: 'https://api.d-id.com/talks',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        authorization: 'Bearer WVc1a2NtbDFjMnRsZG1samFYVnpMbVZ5Ym1WemRHRnpRR2R0WVdsc0xtTnZiUTpGbWxZMEZacC1fLXV0ZWxrZGpOZzc'
-      },
-      data: {
-        script: {
-          type: 'text',
-          provider: {type: 'microsoft', voice_id: 'Jenny'},
-          ssml: 'false',
-          input: result
-        },
-        config: {fluent: 'false', pad_audio: '0.0'},
-        source_url: image
-      }
-    };
-    axios
-    .request(optionsGenerate)
-    .then(function (response) {
-      setLoading(false);
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
-  };
-  useEffect(() => {
-    generateAnimation()
-  }, []);
+const preview = ({result, modalVisible, setModalVisible, navigation, animatedVideo, loading, animatedImage, setAnimatedImage, setAnimatedVideo, uploadedImage }) => {
 
   return (
     <View style={styles.wrapper}>
         <View style={styles.videoContainer}>
-            {loading ? <View style={styles.container}><ActivityIndicator size="large" color={COLORS.green} /></View> : <VideoPlayback />}
+            {loading ? <View style={styles.container}><ActivityIndicator size="large" color={COLORS.green} /></View> : <VideoPlayback animatedVideo={animatedVideo} />}
         </View>
         <Text style={styles.transcript}>Your AI generated BIO</Text>
-        <View style={styles.wrapperInner}>
+        <ScrollView style={styles.wrapperInner}>
           <Text style={styles.textInputGenerated}>{result}</Text>
-        </View>
+        </ScrollView>
         <PopupSuccess modalVisible={modalVisible} setModalVisible={setModalVisible} navigation={navigation} />
   </View>
   )
@@ -71,7 +34,7 @@ export default preview
 
 const styles = StyleSheet.create({
     wrapper: {
-        backgroundColor: "rgba(11, 11, 11, 1)"
+        backgroundColor: "rgba(11, 11, 11, 1)",
       },
       image: {
         width: width,
@@ -91,6 +54,7 @@ const styles = StyleSheet.create({
         borderColor: "rgba(65, 65, 65, 1)",
         borderWidth: 1,
         borderRadius: 8,
+        height: height / 2 + 35
       },
       textInputGenerated: {
         color: COLORS.white,
