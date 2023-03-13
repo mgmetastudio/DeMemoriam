@@ -11,7 +11,7 @@ class UserProfileSerializer(CountryFieldMixin, serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('flow_address', 'username', 'email', 'avatar',
-                  'about_me', 'country', "birth_date", 'first_name', "last_name", "gender")
+                  'about_me', 'country', "birth_date", 'first_name', "last_name", "gender", "phone_number")
         extra_kwargs = {'username': {'required': False}}
         read_only_fields = ('email', 'avatar',)
 
