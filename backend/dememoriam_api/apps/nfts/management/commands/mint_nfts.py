@@ -18,6 +18,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for post in PostNft.objects.filter(status=PostNft.Status.REQUESTED):
+            if not post.video or not post.image or not post.description:
+                continue
 
             post.status = PostNft.Status.PROCESSING
             post.save()
@@ -41,8 +43,7 @@ class Command(BaseCommand):
                                 token_id = int(field["value"]["value"])
 
             except Exception as e:
-                logger.error("Failed find minted NFT id", traceback.format_exc())
-                continue
+                logger.error("Failed to find minted NFT id", traceback.format_exc())
             else:
                 post.token_id = token_id
 
